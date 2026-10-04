@@ -1,43 +1,50 @@
-# ghost Documentation
+# Ghost documentation
 
-👻 Ghost — a customized Hyprland desktop for Arch Linux, with cohesive themes and a Rust-powered installer.
-
-## Documentation Map
+Setup and reference for the checked-in desktop configuration and Rust CLI skeleton.
 
 ```mermaid
 flowchart TD
-    Start["Start here"] --> Readme["../README.md"]
-    Start --> Changelog["../CHANGELOG.md"]
-    Start --> Dev["development/roadmap.md"]
-    Start --> Adv["advisories/README.md"]
-    Adv --> Deps["advisories/dependencies.md"]
-    Adv --> Accepted["advisories/accepted.md"]
-    Adv --> Resolved["advisories/resolved.md"]
+    Start[Choose a task] --> Setup[Manual VM setup]
+    Start --> Customize[Profiles and themes]
+    Start --> Develop[CLI and architecture]
+    Setup --> Check[Runtime troubleshooting]
+    Develop --> Roadmap[Development roadmap]
 ```
 
-## Current Surface
+## Getting started
 
-- Early repository scaffold
-- Language-specific initialization
-- Standard security, contributing, license, and advisory files
+- [Manual installation](getting-started/installation.md) — prerequisites, test-account deployment, validation, and rollback.
+- [Configuration](getting-started/configuration.md) — host selection, monitors, GPU assumptions, and file locations.
+- [Building and checks](getting-started/building.md) — Rust and static configuration checks.
 
-## Directory Structure
+## Guides and reference
 
-```text
-docs/
-├── README.md
-├── advisories/
-│   ├── README.md
-│   ├── dependencies.md
-│   ├── accepted.md
-│   └── resolved.md
-└── development/
-    └── roadmap.md
-```
+- [Themes and dock](guides/themes-and-dock.md) — translucency, blur, colors, and wallpaper paths.
+- [Troubleshooting](guides/troubleshooting.md) — runtime diagnostics and VM acceptance checks.
+- [Keybindings](reference/keybindings.md) — keyboard and mouse controls.
+- [CLI](reference/cli.md) — accepted arguments and current failure behavior.
 
-## Conventions
+## Internals and development
 
-- One concept per page.
-- Filenames are lowercase and hyphenated.
-- Mermaid diagrams are used where they clarify structure or flow.
-- Docs should describe implemented behavior; planned work should be labeled.
+- [Architecture](internals/architecture.md) — Lua startup and the separate CLI flow.
+- [Roadmap](development/roadmap.md) — current implementation and next milestones.
+- [Contributing](../CONTRIBUTING.md) — development workflow.
+- [Changelog](../CHANGELOG.md) — recorded project changes.
+
+## Security and dependencies
+
+- [Security policy](../SECURITY.md) — private reporting and privilege boundaries.
+- [Advisory triage](advisories/triage.md) — review process.
+- [Dependency inventory](advisories/dependencies.md) — Rust and desktop dependency sources.
+- [Accepted advisories](advisories/accepted.md) — documented risk decisions.
+- [Resolved advisories](advisories/resolved.md) — remediation evidence.
+
+## Quick reference
+
+| Task | Command |
+|---|---|
+| Inspect CLI | `cargo run --locked -- --help` |
+| Test CLI | `cargo test --locked` |
+| Inspect displays, inside Hyprland | `hyprctl monitors` |
+| Inspect configuration errors | `hyprctl configerrors` |
+| Inspect window classes / layer namespaces | `hyprctl clients` / `hyprctl layers` |

@@ -2,6 +2,8 @@
 
 Security advisories that have been remediated.
 
-| Advisory | Package | Issue | Resolved by | Date |
-|----------|---------|-------|-------------|------|
-| _(none)_ | | | | |
+No remediation records have been recorded yet.
+
+| Advisory | Package | Issue | Resolved by | Date | Verification |
+|----------|---------|-------|-------------|------|--------------|
+| _(none recorded)_ | | | | | |

@@ -1,0 +1,12 @@
+/* Generated from the active palette (tokyonight-night); `ghost apply` rewrites this file. */
+* {
+    bg: #1a1b26;
+    bg-translucent: rgba(26, 27, 38, 88%);
+    surface: #16161e;
+    surface-alt: #292e42;
+    fg: #c0caf5;
+    muted: #565f89;
+    accent: #7aa2f7;
+    accent-alt: #bb9af7;
+    urgent: #f7768e;
+}

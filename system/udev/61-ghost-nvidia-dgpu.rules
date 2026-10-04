@@ -1,0 +1,5 @@
+# Stable /dev/dri/nvidia-dgpu symlink for the NVIDIA card, so Hyprland's
+# AQ_DRM_DEVICES can name it even when card0/card1 numbering swaps between
+# boots. by-path names can't be used there: they contain ':' (the separator).
+# Assumes a single NVIDIA GPU.
+KERNEL=="card*", SUBSYSTEM=="drm", ATTRS{vendor}=="0x10de", SYMLINK+="dri/nvidia-dgpu"

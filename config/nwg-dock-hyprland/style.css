@@ -1,0 +1,35 @@
+@import "colors.css";
+
+/* Floating, translucent panel; Hyprland blurs the "nwg-dock" layer behind it. */
+window {
+    background: alpha(@surface, 0.55);
+    border: 1px solid alpha(@accent, 0.25);
+    border-radius: 16px;
+}
+
+#box {
+    padding: 6px 10px;
+}
+
+button,
+image {
+    background: none;
+    border-style: none;
+    box-shadow: none;
+    color: @fg;
+}
+
+button {
+    padding: 6px;
+    margin: 0 3px;
+    border-radius: 12px;
+    transition: background-color 150ms ease;
+}
+
+button:hover {
+    background-color: alpha(@accent, 0.18);
+}
+
+button:focus {
+    box-shadow: none;
+}

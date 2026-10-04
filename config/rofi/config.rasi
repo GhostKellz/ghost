@@ -1,0 +1,12 @@
+configuration {
+    modi: "drun,window,run";
+    show-icons: true;
+    drun-display-format: "{name}";
+    display-drun: "apps";
+    display-window: "windows";
+    display-run: "run";
+    terminal: "ghostty";
+    font: "JetBrainsMono Nerd Font 12";
+}
+
+@theme "ghost.rasi"

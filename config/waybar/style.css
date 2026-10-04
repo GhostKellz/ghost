@@ -1,0 +1,104 @@
+@import "colors.css";
+
+/* Quiet, full-width strip: translucent surface (Hyprland blurs the layer),
+   a hairline bottom edge, no per-module boxes. Accent blue marks only active
+   state; red only urgent. Kept calmer than the floating dock. */
+
+* {
+    font-family: "JetBrainsMono Nerd Font";
+    font-size: 15px;
+    min-height: 0;
+    border: none;
+    border-radius: 0;
+}
+
+window#waybar {
+    background: alpha(@surface, 0.72);
+    border-bottom: 1px solid alpha(@fg, 0.06);
+    color: @fg_soft;
+}
+
+tooltip {
+    background: @bg;
+    border: 1px solid alpha(@accent, 0.3);
+    border-radius: 8px;
+}
+
+tooltip label {
+    color: @fg;
+}
+
+/* Left */
+
+#workspaces {
+    margin-left: 10px;
+}
+
+#workspaces button {
+    min-width: 22px;
+    padding: 0 4px;
+    margin: 6px 1px;
+    color: @muted;
+    background: transparent;
+    border-radius: 6px;
+    transition: background-color 150ms ease, color 150ms ease;
+}
+
+#workspaces button:hover {
+    background: alpha(@accent, 0.10);
+    color: @fg;
+}
+
+#workspaces button.active {
+    color: @accent;
+}
+
+#workspaces button.urgent {
+    color: @urgent;
+}
+
+#window {
+    margin-left: 14px;
+    color: @muted;
+}
+
+/* Center */
+
+#clock {
+    color: @fg;
+}
+
+/* Right */
+
+#custom-media,
+#wireplumber,
+#network,
+#custom-notifications {
+    padding: 0 11px;
+    color: @fg_soft;
+    transition: color 150ms ease;
+}
+
+#custom-media:hover,
+#wireplumber:hover,
+#network:hover,
+#custom-notifications:hover {
+    color: @fg;
+}
+
+#custom-media.paused {
+    color: @muted;
+}
+
+#wireplumber.muted,
+#network.disconnected {
+    color: @urgent;
+}
+
+#tray {
+    padding: 0 14px 0 6px;
+}
+
+#tray > .needs-attention {
+    color: @urgent;
+}

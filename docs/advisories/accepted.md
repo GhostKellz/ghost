@@ -2,6 +2,8 @@
 
 Security advisories or dependency risks that are knowingly accepted.
 
-| Advisory | Package | Severity | Rationale | Review date |
-|----------|---------|----------|-----------|-------------|
-| _(none)_ | | | | |
+No accepted advisories have been recorded. This is not a clean-scan claim.
+
+| Advisory | Package | Severity | Source chain | Rationale | Review date |
+|----------|---------|----------|--------------|-----------|-------------|
+| _(none recorded)_ | | | | | |

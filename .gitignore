@@ -4,8 +4,15 @@
 
 # Local workflow / scratch (not committed)
 tasks/
+.scratch/
 CLAUDE.md
 archive/
+
+# Personal wallpapers with unclear licenses — installed locally, never published
+wallpapers/collection/
+
+# Logo drafts
+assets/prototype*.png
 
 # Editor / OS
 .vscode/

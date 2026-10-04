@@ -41,3 +41,24 @@ security fixes.
 
 We follow coordinated disclosure. Please allow a reasonable window to ship a fix
 before public discussion. Reporters who wish to be credited will be acknowledged.
+
+## Privilege Boundaries
+
+| Component | Privilege / data access |
+|-----------|-------------------------|
+| Current Rust CLI | User process; parses arguments and returns an unimplemented error |
+| Desktop configuration | Runs commands as the logged-in user |
+| Clipboard history | Stores copied content through cliphist; may include sensitive text |
+| Manual package installation | Administrative access through the package manager |
+| Optional udev rule | System configuration; requires administrative installation |
+
+Idle display blanking does not lock the session immediately. The supplied policy
+blanks after ten minutes and locks after fifteen. Test hypridle and hyprlock in
+the target session before relying on either explicit or automatic locking.
+
+## Dependency Review
+
+Run `cargo audit` with a current advisory database when available. Record actual
+results and decisions in [advisories](docs/advisories/triage.md); unit tests do
+not constitute an advisory scan. Review logs and window titles for private data
+before including diagnostics in public issues.

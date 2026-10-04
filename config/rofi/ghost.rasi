@@ -1,0 +1,69 @@
+@import "colors.rasi"
+
+* {
+    background-color: transparent;
+    text-color: @fg;
+    spacing: 0;
+}
+
+window {
+    width: 640px;
+    /* Translucent; Hyprland blurs the rofi layer behind it. */
+    background-color: @bg-translucent;
+    border: 2px;
+    border-color: @accent;
+    border-radius: 12px;
+    padding: 16px;
+}
+
+mainbox {
+    spacing: 12px;
+    children: [ inputbar, listview ];
+}
+
+inputbar {
+    padding: 10px 12px;
+    background-color: @surface-alt;
+    border-radius: 8px;
+    spacing: 8px;
+    children: [ prompt, entry ];
+}
+
+prompt {
+    text-color: @accent;
+}
+
+entry {
+    placeholder: "search";
+    placeholder-color: @muted;
+}
+
+listview {
+    lines: 8;
+    scrollbar: false;
+    spacing: 4px;
+}
+
+element {
+    padding: 8px 12px;
+    border-radius: 8px;
+    spacing: 10px;
+}
+
+element selected {
+    background-color: @surface-alt;
+    text-color: @accent;
+}
+
+element urgent {
+    text-color: @urgent;
+}
+
+element-icon {
+    size: 24px;
+}
+
+element-text {
+    text-color: inherit;
+    vertical-align: 0.5;
+}

@@ -1,0 +1,62 @@
+name: Bug report
+description: Report a desktop, CLI, or configuration failure.
+title: "[bug] "
+labels: [bug]
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: input
+    id: revision
+    attributes:
+      label: Ghost revision
+      description: Include git rev-parse HEAD and whether local changes are present.
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: Distribution, Hyprland version, GPU, host profile, and VM or physical machine.
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - CLI
+        - Displays and GPU
+        - Dock and shell
+        - Workspaces and bindings
+        - Lock and idle
+        - Themes and wallpapers
+        - Documentation
+    validations:
+      required: true
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Diagnostics
+      description: Include relevant configerrors and logs; redact private paths and window titles.

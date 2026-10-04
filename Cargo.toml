@@ -1,0 +1,18 @@
+[package]
+name = "ghost"
+version = "0.1.0"
+edition = "2024"
+description = "A themeable Hyprland desktop and installer for Arch Linux"
+license = "MIT"
+repository = "https://github.com/GhostKellz/ghost"
+readme = "README.md"
+publish = false
+
+[dependencies]
+anyhow = "1.0.104"
+clap = { version = "4.6.7", features = ["derive"] }
+
+[profile.release]
+lto = true
+strip = true
+codegen-units = 1

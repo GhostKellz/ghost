@@ -1,0 +1,90 @@
+// ghost — top bar. One bar per monitor; workspaces and window title are
+// scoped to the bar's own output.
+{
+    "layer": "top",
+    "position": "top",
+    "height": 36,
+    "spacing": 0,
+
+    "modules-left": ["hyprland/workspaces", "hyprland/window"],
+    "modules-center": ["clock"],
+    "modules-right": ["custom/media", "wireplumber", "network", "custom/notifications", "tray"],
+
+    "hyprland/workspaces": {
+        "all-outputs": false,
+        "format": "{icon}",
+        "format-icons": {
+            "active": "",
+            "urgent": "",
+            "default": "",
+            "empty": ""
+        },
+        "on-scroll-up": "hyprctl dispatch 'hl.dsp.focus({ workspace = \"m-1\" })'",
+        "on-scroll-down": "hyprctl dispatch 'hl.dsp.focus({ workspace = \"m+1\" })'"
+    },
+
+    "hyprland/window": {
+        "format": "{title}",
+        "icon": true,
+        "icon-size": 18,
+        "max-length": 72,
+        "separate-outputs": true
+    },
+
+    "clock": {
+        "format": "{:%a %b %d   %H:%M}",
+        "tooltip-format": "<tt>{calendar}</tt>",
+        "calendar": {
+            "mode": "month",
+            "weeks-pos": "",
+            "format": {
+                "today": "<b><u>{}</u></b>"
+            }
+        }
+    },
+
+    // Sonora first, then any MPRIS player; hidden when nothing is playing or
+    // paused (the script prints empty text). Click toggles play/pause.
+    "custom/media": {
+        "exec": "$HOME/.config/waybar/scripts/media.sh",
+        "return-type": "json",
+        "max-length": 48,
+        "escape": true,
+        "on-click": "playerctl --player=sonora,%any play-pause"
+    },
+
+    "wireplumber": {
+        "format": "{icon}  {volume}%",
+        "format-muted": "  muted",
+        "format-icons": ["", "", ""],
+        "on-click": "pavucontrol"
+    },
+
+    "network": {
+        "format-ethernet": "",
+        "format-wifi": "  {signalStrength}%",
+        "format-disconnected": "",
+        "tooltip-format": "{ifname}  {ipaddr}",
+        "on-click": "nm-connection-editor"
+    },
+
+    "custom/notifications": {
+        "exec": "swaync-client -swb",
+        "return-type": "json",
+        "format": "{icon}",
+        "format-icons": {
+            "notification": "",
+            "none": "",
+            "dnd-notification": "",
+            "dnd-none": ""
+        },
+        "on-click": "swaync-client -t -sw",
+        "on-click-right": "swaync-client -d -sw",
+        "escape": true
+    },
+
+    "tray": {
+        "icon-size": 18,
+        "spacing": 10
+    }
+}

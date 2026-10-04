@@ -1,0 +1,38 @@
+@import "colors.css";
+
+* {
+    font-family: "JetBrainsMono Nerd Font";
+}
+
+.notification {
+    background: alpha(@surface, 0.92);
+    color: @fg;
+    border: 1px solid @surface_alt;
+    border-radius: 10px;
+}
+
+.notification.critical {
+    border-color: @urgent;
+}
+
+.summary {
+    color: @fg;
+    font-weight: bold;
+}
+
+.body {
+    color: @muted;
+}
+
+.control-center {
+    background: alpha(@bg, 0.9);
+    color: @fg;
+    border: 2px solid @accent;
+    border-radius: 12px;
+}
+
+.close-button {
+    background: @surface_alt;
+    color: @fg;
+    border-radius: 50%;
+}
