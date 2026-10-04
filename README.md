@@ -85,4 +85,4 @@ Report vulnerabilities privately using [SECURITY.md](SECURITY.md). Dependency de
 
 ## License
 
-Project code is [MIT licensed](LICENSE). Bundled wallpapers retain their [own license](wallpapers/tokyonight/LICENSE.txt); palette comments identify their upstream source. Personal wallpaper collections are excluded from Git.
+Project code is [MIT licensed](LICENSE). Palette comments identify their upstream source.

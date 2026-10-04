@@ -39,12 +39,9 @@ mkdir -p "$HOME/.config" "$HOME/.local/share/ghost/wallpapers"
 for component in hypr waybar rofi swaync nwg-dock-hyprland; do
     cp -a "config/$component" "$HOME/.config/"
 done
-cp wallpapers/tokyonight/night/arch_*.png "$HOME/.local/share/ghost/wallpapers/"
-cp wallpapers/tokyonight/night/stripes_*.png "$HOME/.local/share/ghost/wallpapers/"
-cp wallpapers/tokyonight/night/lockscreen_00_3840x2160.png "$HOME/.local/share/ghost/lockscreen.png"
 ```
 
-The wallpaper files are copied directly into the configured directory, avoiding any assumption about recursive scanning. The lock screen gets its own image. Personal wallpaper collections are not part of this setup.
+Ghost ships no wallpapers. Copy your own images into `~/.local/share/ghost/wallpapers/` (hyprpaper cycles them) and one image to `~/.local/share/ghost/lockscreen.png` (the lock screen). See [wallpapers](../guides/themes-and-dock.md#wallpapers).
 
 Review [host selection](configuration.md) before launch, especially if the hostname is `arch`. For a generic VM, use automatic outputs first. This procedure intentionally does not install the workstation-specific udev rule or an optional workspace package.
 

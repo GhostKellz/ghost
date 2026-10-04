@@ -5,7 +5,7 @@
 - Rust CLI parser, argument tests, and explicit failures for unfinished commands.
 - Modular Hyprland Lua config with host profiles and optional workspace integration.
 - Waybar, rofi, swaync, dock, idle, lock-screen, and wallpaper configuration.
-- Night and Storm palette definitions and bundled wallpaper sets.
+- Night and Storm palette definitions.
 - Arch package manifest and a workstation-specific udev rule.
 
 Presence of a configuration file does not establish runtime compatibility. Complete the [VM checklist](../guides/troubleshooting.md) in the target session.

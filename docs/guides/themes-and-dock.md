@@ -33,10 +33,19 @@ Tune the deployed files, then restart the dock process or log out and back in. A
 
 Blur is requested for `waybar`, `rofi`, `nwg-dock`, `swaync-control-center`, and `swaync-notification-window`. Confirm the actual namespaces with `hyprctl layers`. The `ignore_alpha = 0.5` threshold means very transparent pixels may not receive blur; lowering panel alpha below that threshold can change the effect. Visual confirmation is still required.
 
-## Wallpapers and manual colors
+## Wallpapers
 
-Deploy one wallpaper set directly to `~/.local/share/ghost/wallpapers/`. `hyprpaper.conf` requests random cycling every half hour. `hyprlock.conf` independently reads `~/.local/share/ghost/lockscreen.png`. See [hyprpaper's documentation](https://wiki.hypr.land/Hypr-Ecosystem/hyprpaper/) for directory cycling support in your installed version.
+Ghost ships no wallpapers; you provide your own.
+
+| Path | Used by | Notes |
+|---|---|---|
+| `~/.local/share/ghost/wallpapers/` | hyprpaper | Images in this folder are shown in random order, changing every 30 minutes |
+| `~/.local/share/ghost/lockscreen.png` | hyprlock | Lock-screen background |
+
+Add or remove images in the folder at any time; restart hyprpaper (or log out and back in) to pick up changes. Change the interval with `timeout` in `hypr/hyprpaper.conf`.
+
+## Manual colors
 
 For a manual Storm conversion, update each application's color file, the Lua palette, and lock-screen colors together using the Storm palette roles. Keep this explicit until the generator exists; comments saying “generated” describe the intended future workflow.
 
-Bundled wallpapers have a [retained MIT license](../../wallpapers/tokyonight/LICENSE.txt). Palette comments attribute colors to `folke/tokyonight.nvim`; provenance and redistribution notices should be checked before a release. Files under `wallpapers/collection/` are personal and gitignored.
+Palette comments attribute colors to `folke/tokyonight.nvim`; provenance and redistribution notices should be checked before a release.
