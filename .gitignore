@@ -1,0 +1,16 @@
+# Rust
+/target
+**/*.rs.bk
+
+# Local workflow / scratch (not committed)
+tasks/
+CLAUDE.md
+archive/
+
+# Editor / OS
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
