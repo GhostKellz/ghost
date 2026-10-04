@@ -21,11 +21,6 @@
 
 Ghost brings a consistent Tokyo Night appearance to Hyprland, Waybar, rofi, notifications, the dock, and the lock screen. It uses modular Lua configuration with per-host monitor and GPU settings. The supplied workstation profile targets a dual-monitor NVIDIA desktop; unknown hosts use automatic output configuration.
 
-<p align="center">
-  <img src="wallpapers/tokyonight/night/arch_00_3840x2160.png" width="800" alt="Bundled Tokyo Night Night Arch wallpaper">
-  <br><em>Bundled wallpaper — a desktop screenshot will follow live validation.</em>
-</p>
-
 ## Features
 
 - **Floating dock:** translucent surface, rounded corners, blue hover highlight, autohide, and a rofi launcher button.
