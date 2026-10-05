@@ -1,0 +1,28 @@
+[Desktop Entry]
+# Ghost override: identical to Ghostty's entry except Icon, which points at
+# Ghostty's own icon so the icon theme (Tela) can't replace it.
+Version=1.0
+Name=Ghostty
+Type=Application
+Comment=A terminal emulator
+TryExec=/usr/bin/ghostty
+Exec=/usr/bin/ghostty --gtk-single-instance=true
+Icon=/usr/share/icons/hicolor/512x512/apps/com.mitchellh.ghostty.png
+Categories=System;TerminalEmulator;
+Keywords=terminal;tty;pty;
+StartupNotify=true
+StartupWMClass=com.mitchellh.ghostty
+Terminal=false
+Actions=new-window;
+X-GNOME-UsesNotifications=true
+X-TerminalArgExec=-e
+X-TerminalArgTitle=--title=
+X-TerminalArgAppId=--class=
+X-TerminalArgDir=--working-directory=
+X-TerminalArgHold=--wait-after-command
+DBusActivatable=true
+X-KDE-Shortcuts=Ctrl+Alt+T
+
+[Desktop Action new-window]
+Name=New Window
+Exec=/usr/bin/ghostty --gtk-single-instance=true

@@ -1,5 +1,9 @@
 -- Keybinds. Vim-style focus/move/resize and desktop switching keep the
 -- KDE + Krohnkite muscle memory; see docs for the full table.
+--
+-- Every bind carries a description: SUPER+/ lists them from `hyprctl binds`,
+-- where Lua binds otherwise show only as "__lua", so the help can't drift
+-- from the real bindings.
 
 local M = {}
 
@@ -12,6 +16,12 @@ local native_workspaces = {
     cycle = function(d) return hl.dsp.focus({ workspace = d == "next" and "m+1" or "m-1" }) end,
     carry = function(d) return hl.dsp.window.move({ workspace = d == "next" and "m+1" or "m-1" }) end,
 }
+
+local function bind(combo, description, action, opts)
+    opts = opts or {}
+    opts.description = description
+    hl.bind(combo, action, opts)
+end
 
 function M.setup(ws)
     ws = ws or native_workspaces
@@ -26,24 +36,26 @@ function M.setup(ws)
     end
 
     -- Apps
-    hl.bind(key("Return"), hl.dsp.exec_cmd(terminal))
-    hl.bind(key("Space"), hl.dsp.exec_cmd(launcher))
-    hl.bind(key("E"), hl.dsp.exec_cmd(file_manager))
+    bind(key("Return"), "Terminal", hl.dsp.exec_cmd(terminal))
+    bind(key("Space"), "Application launcher", hl.dsp.exec_cmd(launcher))
+    bind(key("E"), "File manager", hl.dsp.exec_cmd(file_manager))
     -- No overview plugin exists for 0.56 (hyprexpo was removed upstream), so
     -- SUPER+W lists open windows instead.
-    hl.bind(key("W"), hl.dsp.exec_cmd(window_switcher))
-    hl.bind(key("V"), hl.dsp.exec_cmd("cliphist list | rofi -dmenu -p clipboard | cliphist decode | wl-copy"))
+    bind(key("W"), "Window switcher", hl.dsp.exec_cmd(window_switcher))
+    bind(key("V"), "Clipboard history", hl.dsp.exec_cmd("cliphist list | rofi -dmenu -p clipboard | cliphist decode | wl-copy"))
+    bind(key("slash"), "Keybind help", hl.dsp.exec_cmd("~/.config/hypr/scripts/keybinds.sh"))
 
     -- Windows
-    hl.bind("ALT + F4", hl.dsp.window.close())
-    hl.bind(key("CTRL + Escape"), hl.dsp.window.kill())
-    hl.bind(key("F"), hl.dsp.window.float({ action = "toggle" }))
+    bind(key("Q"), "Close window", hl.dsp.window.close())
+    bind("ALT + F4", "Close window", hl.dsp.window.close())
+    bind(key("CTRL + Escape"), "Force-kill window", hl.dsp.window.kill())
+    bind(key("F"), "Toggle floating", hl.dsp.window.float({ action = "toggle" }))
     -- Monocle: maximize within the layout, keeping bar and gaps.
-    hl.bind(key("M"), hl.dsp.window.fullscreen({ mode = "maximized", action = "toggle" }))
-    hl.bind(key("SHIFT + Return"), hl.dsp.layout("swapwithmaster master"))
+    bind(key("M"), "Toggle maximized", hl.dsp.window.fullscreen({ mode = "maximized", action = "toggle" }))
+    bind(key("SHIFT + Return"), "Swap with master", hl.dsp.layout("swapwithmaster master"))
 
     -- Toggle master <-> dwindle for the whole session.
-    hl.bind(key("T"), function()
+    bind(key("T"), "Toggle master/dwindle layout", function()
         local current = hl.get_config("general.layout")
         hl.config({ general = { layout = current == "master" and "dwindle" or "master" } })
     end)
@@ -51,38 +63,38 @@ function M.setup(ws)
     -- Focus / move / resize (H J K L)
     local directions = { H = "left", J = "down", K = "up", L = "right" }
     for k, dir in pairs(directions) do
-        hl.bind(key(k), hl.dsp.focus({ direction = dir }))
-        hl.bind(key("SHIFT + " .. k), hl.dsp.window.swap({ direction = dir }))
+        bind(key(k), "Focus " .. dir, hl.dsp.focus({ direction = dir }))
+        bind(key("SHIFT + " .. k), "Swap window " .. dir, hl.dsp.window.swap({ direction = dir }))
     end
     -- Same grow/shrink mapping as Krohnkite: L/J grow, H/K shrink.
     local step = 60
-    hl.bind(key("CTRL + L"), hl.dsp.window.resize({ x = step, y = 0, relative = true }), { repeating = true })
-    hl.bind(key("CTRL + H"), hl.dsp.window.resize({ x = -step, y = 0, relative = true }), { repeating = true })
-    hl.bind(key("CTRL + J"), hl.dsp.window.resize({ x = 0, y = step, relative = true }), { repeating = true })
-    hl.bind(key("CTRL + K"), hl.dsp.window.resize({ x = 0, y = -step, relative = true }), { repeating = true })
+    bind(key("CTRL + L"), "Grow width", hl.dsp.window.resize({ x = step, y = 0, relative = true }), { repeating = true })
+    bind(key("CTRL + H"), "Shrink width", hl.dsp.window.resize({ x = -step, y = 0, relative = true }), { repeating = true })
+    bind(key("CTRL + J"), "Grow height", hl.dsp.window.resize({ x = 0, y = step, relative = true }), { repeating = true })
+    bind(key("CTRL + K"), "Shrink height", hl.dsp.window.resize({ x = 0, y = -step, relative = true }), { repeating = true })
 
     -- Workspaces (per monitor)
-    hl.bind(key("CTRL + left"), ws.cycle("prev"))
-    hl.bind(key("CTRL + right"), ws.cycle("next"))
-    hl.bind(key("CTRL + SHIFT + left"), ws.carry("prev"))
-    hl.bind(key("CTRL + SHIFT + right"), ws.carry("next"))
+    bind(key("CTRL + left"), "Previous workspace", ws.cycle("prev"))
+    bind(key("CTRL + right"), "Next workspace", ws.cycle("next"))
+    bind(key("CTRL + SHIFT + left"), "Carry window to previous workspace", ws.carry("prev"))
+    bind(key("CTRL + SHIFT + right"), "Carry window to next workspace", ws.carry("next"))
     for i = 1, ws.count do
-        hl.bind(key(tostring(i)), ws.focus(i))
-        hl.bind(key("SHIFT + " .. i), ws.move_silent(i))
+        bind(key(tostring(i)), "Workspace " .. i, ws.focus(i))
+        bind(key("SHIFT + " .. i), "Move window to workspace " .. i, ws.move_silent(i))
     end
 
     -- Monitors
-    hl.bind(key("SHIFT + left"), hl.dsp.window.move({ monitor = "l" }))
-    hl.bind(key("SHIFT + right"), hl.dsp.window.move({ monitor = "r" }))
+    bind(key("SHIFT + left"), "Move window to left monitor", hl.dsp.window.move({ monitor = "l" }))
+    bind(key("SHIFT + right"), "Move window to right monitor", hl.dsp.window.move({ monitor = "r" }))
 
     -- Mouse
-    hl.bind(key("mouse:272"), hl.dsp.window.drag(), { mouse = true })
-    hl.bind(key("mouse:273"), hl.dsp.window.resize(), { mouse = true })
+    bind(key("mouse:272"), "Move window (drag)", hl.dsp.window.drag(), { mouse = true })
+    bind(key("mouse:273"), "Resize window (drag)", hl.dsp.window.resize(), { mouse = true })
 
     -- Lock and blank. The delay stops the key release from waking the panels
     -- straight back up (wiki-recommended pattern for dpms binds).
-    hl.bind(key("Escape"), hl.dsp.exec_cmd("loginctl lock-session"))
-    hl.bind(key("SHIFT + Escape"), function()
+    bind(key("Escape"), "Lock session", hl.dsp.exec_cmd("loginctl lock-session"))
+    bind(key("SHIFT + Escape"), "Lock and blank displays", function()
         hl.exec_cmd("loginctl lock-session")
         hl.timer(function()
             hl.dispatch(hl.dsp.dpms({ action = "disable" }))
@@ -90,18 +102,18 @@ function M.setup(ws)
     end)
 
     -- Screenshots
-    hl.bind("Print", hl.dsp.exec_cmd('grim -g "$(slurp)" - | satty --filename -'))
-    hl.bind("SHIFT + Print", hl.dsp.exec_cmd("grim - | satty --filename -"))
+    bind("Print", "Screenshot region", hl.dsp.exec_cmd('grim -g "$(slurp)" - | satty --filename -'))
+    bind("SHIFT + Print", "Screenshot all outputs", hl.dsp.exec_cmd("grim - | satty --filename -"))
 
     -- Media / volume
-    hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+"), { locked = true, repeating = true })
-    hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"), { locked = true, repeating = true })
-    hl.bind("XF86AudioMute", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"), { locked = true })
-    hl.bind("XF86AudioMicMute", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"), { locked = true })
-    hl.bind("XF86AudioPlay", hl.dsp.exec_cmd("playerctl --player=sonora,%any play-pause"), { locked = true })
-    hl.bind("XF86AudioPause", hl.dsp.exec_cmd("playerctl --player=sonora,%any play-pause"), { locked = true })
-    hl.bind("XF86AudioNext", hl.dsp.exec_cmd("playerctl --player=sonora,%any next"), { locked = true })
-    hl.bind("XF86AudioPrev", hl.dsp.exec_cmd("playerctl --player=sonora,%any previous"), { locked = true })
+    bind("XF86AudioRaiseVolume", "Volume up", hl.dsp.exec_cmd("wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+"), { locked = true, repeating = true })
+    bind("XF86AudioLowerVolume", "Volume down", hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"), { locked = true, repeating = true })
+    bind("XF86AudioMute", "Mute output", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"), { locked = true })
+    bind("XF86AudioMicMute", "Mute microphone", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"), { locked = true })
+    bind("XF86AudioPlay", "Play/pause", hl.dsp.exec_cmd("playerctl --player=sonora,%any play-pause"), { locked = true })
+    bind("XF86AudioPause", "Play/pause", hl.dsp.exec_cmd("playerctl --player=sonora,%any play-pause"), { locked = true })
+    bind("XF86AudioNext", "Next track", hl.dsp.exec_cmd("playerctl --player=sonora,%any next"), { locked = true })
+    bind("XF86AudioPrev", "Previous track", hl.dsp.exec_cmd("playerctl --player=sonora,%any previous"), { locked = true })
 end
 
 return M

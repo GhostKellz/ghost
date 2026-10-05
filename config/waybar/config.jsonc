@@ -12,13 +12,8 @@
 
     "hyprland/workspaces": {
         "all-outputs": false,
-        "format": "{icon}",
-        "format-icons": {
-            "active": "",
-            "urgent": "",
-            "default": "",
-            "empty": ""
-        },
+        // Pager-style boxes (see style.css): no labels, state shown by fill.
+        "format": " ",
         "on-scroll-up": "hyprctl dispatch 'hl.dsp.focus({ workspace = \"m-1\" })'",
         "on-scroll-down": "hyprctl dispatch 'hl.dsp.focus({ workspace = \"m+1\" })'"
     },

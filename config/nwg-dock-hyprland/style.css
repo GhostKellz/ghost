@@ -2,7 +2,7 @@
 
 /* Floating, translucent panel; Hyprland blurs the "nwg-dock" layer behind it. */
 window {
-    background: alpha(@surface, 0.55);
+    background: alpha(@surface, 0.40);
     border: 1px solid alpha(@accent, 0.25);
     border-radius: 16px;
 }
@@ -27,7 +27,8 @@ button {
 }
 
 button:hover {
-    background-color: alpha(@accent, 0.18);
+    background-color: alpha(@accent, 0.20);
+    box-shadow: 0 0 10px alpha(@accent, 0.35);
 }
 
 button:focus {

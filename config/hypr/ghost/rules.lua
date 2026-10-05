@@ -27,7 +27,7 @@ function M.setup(host)
 
     -- Blur behind translucent shell surfaces.
     for _, namespace in ipairs({ "waybar", "rofi", "nwg-dock", "swaync-control-center", "swaync-notification-window" }) do
-        hl.layer_rule({ match = { namespace = namespace }, blur = true, ignore_alpha = 0.5 })
+        hl.layer_rule({ match = { namespace = namespace }, blur = true, ignore_alpha = 0.1 })
     end
 end
 

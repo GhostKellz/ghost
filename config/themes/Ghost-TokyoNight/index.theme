@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=X-GNOME-Metatheme
+Name=Ghost-TokyoNight
+Comment=Tokyo Night (Night) over Adwaita-dark, from Ghost
+
+[X-GNOME-Metatheme]
+GtkTheme=Ghost-TokyoNight
+IconTheme=Tela-blue-dark
+ButtonLayout=:minimize,maximize,close

@@ -1,0 +1,67 @@
+/* Tokyo Night (Night) for GTK 4 / libadwaita apps, which are dark via the
+   color-scheme setting. libadwaita reads both the CSS variables and the
+   older named colours. */
+
+:root {
+    --accent-bg-color: #7aa2f7;
+    --accent-fg-color: #1a1b26;
+    --accent-color: #7aa2f7;
+    --window-bg-color: #1a1b26;
+    --window-fg-color: #c0caf5;
+    --view-bg-color: #1f2335;
+    --view-fg-color: #c0caf5;
+    --headerbar-bg-color: #16161e;
+    --headerbar-fg-color: #c0caf5;
+    --headerbar-backdrop-color: #16161e;
+    --headerbar-border-color: #292e42;
+    --sidebar-bg-color: #16161e;
+    --sidebar-fg-color: #c0caf5;
+    --card-bg-color: #1f2335;
+    --card-fg-color: #c0caf5;
+    --dialog-bg-color: #1a1b26;
+    --dialog-fg-color: #c0caf5;
+    --popover-bg-color: #16161e;
+    --popover-fg-color: #c0caf5;
+    --destructive-bg-color: #f7768e;
+}
+
+@define-color accent_bg_color #7aa2f7;
+@define-color accent_fg_color #1a1b26;
+@define-color accent_color #7aa2f7;
+@define-color window_bg_color #1a1b26;
+@define-color window_fg_color #c0caf5;
+@define-color view_bg_color #1f2335;
+@define-color view_fg_color #c0caf5;
+@define-color headerbar_bg_color #16161e;
+@define-color headerbar_fg_color #c0caf5;
+@define-color headerbar_backdrop_color #16161e;
+@define-color headerbar_border_color #292e42;
+@define-color sidebar_bg_color #16161e;
+@define-color sidebar_fg_color #c0caf5;
+@define-color card_bg_color #1f2335;
+@define-color card_fg_color #c0caf5;
+@define-color dialog_bg_color #1a1b26;
+@define-color dialog_fg_color #c0caf5;
+@define-color popover_bg_color #16161e;
+@define-color popover_fg_color #c0caf5;
+
+/* macOS-style window buttons: close red, minimise yellow, maximise green. */
+windowcontrols > button {
+    min-width: 14px;
+    min-height: 14px;
+    padding: 0;
+    margin: 0 4px;
+}
+windowcontrols > button > image {
+    background: none;
+    color: transparent;
+    padding: 0;
+    min-width: 14px;
+    min-height: 14px;
+    border-radius: 50%;
+}
+windowcontrols > button:hover > image { color: #1a1b26; }
+windowcontrols > button.close > image { background-color: #f7768e; }
+windowcontrols > button.minimize > image { background-color: #e0af68; }
+windowcontrols > button.maximize > image { background-color: #9ece6a; }
+windowcontrols > button:backdrop > image { background-color: #565f89; }

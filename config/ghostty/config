@@ -1,0 +1,36 @@
+# Ghostty for Ghost: the ghostkellz hacker-blue look (from Chris's dotfiles)
+# on frosted glass. The translucent background is blurred by Hyprland
+# (decoration.blur in ghost/look.lua).
+font-family = CaskaydiaCove NFM SemiBold
+font-size = 15
+
+foreground = #57c7ff
+background = #0d1117
+background-opacity = 0.82
+cursor-color = #57c7ff
+selection-background = #23476a
+selection-foreground = #ffffff
+
+# ghostkellz palette: normal 0-7, bright 8-15.
+palette = 0=#0c0f17
+palette = 1=#ff5c57
+palette = 2=#8aff80
+palette = 3=#f3f99d
+palette = 4=#57c7ff
+palette = 5=#ff6ac1
+palette = 6=#9aedfe
+palette = 7=#f1f1f0
+palette = 8=#686868
+palette = 9=#ff5c57
+palette = 10=#8aff80
+palette = 11=#f3f99d
+palette = 12=#57c7ff
+palette = 13=#ff6ac1
+palette = 14=#9aedfe
+palette = 15=#ffffff
+
+window-padding-x = 12
+window-padding-y = 10
+window-decoration = none
+cursor-style = bar
+scrollback-limit = 10000000

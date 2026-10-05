@@ -1,0 +1,211 @@
+/* Ghost Tokyo Night (Night) GTK 3 theme: Adwaita-dark plus Tokyo Night colours.
+   Shipped as a theme, not ~/.config/gtk-3.0/gtk.css, because theme CSS has lower
+   priority than an app's own CSS: the dock and Waybar keep their own styling. */
+@import url("resource:///org/gtk/libgtk/theme/Adwaita/gtk-contained-dark.css");
+
+
+@define-color tn_bg #1a1b26;
+@define-color tn_surface #16161e;
+@define-color tn_view #1f2335;
+@define-color tn_raised #24283b;
+@define-color tn_hover #292e42;
+@define-color tn_border #292e42;
+@define-color tn_fg #c0caf5;
+@define-color tn_muted #a9b1d6;
+@define-color tn_dim #565f89;
+@define-color tn_accent #7aa2f7;
+@define-color tn_on_accent #1a1b26;
+
+@define-color theme_bg_color @tn_bg;
+@define-color theme_fg_color @tn_fg;
+@define-color theme_base_color @tn_view;
+@define-color theme_text_color @tn_fg;
+@define-color theme_selected_bg_color @tn_accent;
+@define-color theme_selected_fg_color @tn_on_accent;
+@define-color borders @tn_border;
+
+window, .background, dialog, messagedialog .dialog-action-box {
+    background-color: @tn_bg;
+    color: @tn_fg;
+}
+
+headerbar, .titlebar, headerbar:backdrop, .titlebar:backdrop {
+    background: @tn_surface;
+    border-color: @tn_border;
+    color: @tn_fg;
+    box-shadow: none;
+}
+
+.view, treeview.view, textview text, iconview, list, list row, scrolledwindow viewport {
+    background-color: @tn_view;
+    color: @tn_fg;
+}
+
+treeview.view header button, columnview > header button {
+    background: @tn_surface;
+    color: @tn_muted;
+    border-color: @tn_border;
+}
+
+/* :focus variants: Adwaita colours focused selections with more specific rules. */
+.view:selected, .view:selected:focus, treeview.view:selected, treeview.view:selected:focus,
+list row:selected, list row:selected:focus, iconview:selected, iconview:selected:focus,
+textview text selection, textview text selection:focus, entry selection, label selection {
+    background-color: @tn_accent;
+    color: @tn_on_accent;
+}
+
+entry, spinbutton:not(.vertical), combobox entry {
+    background-color: @tn_view;
+    color: @tn_fg;
+    border-color: @tn_border;
+    box-shadow: none;
+}
+
+entry:focus, spinbutton:focus-within {
+    border-color: @tn_accent;
+    box-shadow: inset 0 0 0 1px @tn_accent;
+}
+
+button, combobox button, notebook > header tab {
+    background-image: none;
+    background-color: @tn_raised;
+    color: @tn_fg;
+    border-color: @tn_border;
+    box-shadow: none;
+    text-shadow: none;
+    -gtk-icon-shadow: none;
+}
+
+button:hover {
+    background-color: @tn_hover;
+}
+
+button:checked, notebook > header tab:checked {
+    background-color: @tn_hover;
+    color: @tn_accent;
+}
+
+button.suggested-action {
+    background-color: @tn_accent;
+    color: @tn_on_accent;
+}
+
+button.destructive-action {
+    background-color: #f7768e;
+    color: @tn_on_accent;
+}
+
+actionbar, actionbar > revealer > box, .inline-toolbar, toolbar, statusbar,
+notebook > header, notebook > stack:not(:only-child), .sidebar, placessidebar list {
+    background-color: @tn_surface;
+    border-color: @tn_border;
+}
+
+menu, .menu, .context-menu, popover, popover.background {
+    background-color: @tn_surface;
+    color: @tn_fg;
+    border-color: @tn_border;
+}
+
+menuitem:hover, menu menuitem:hover, modelbutton:hover {
+    background-color: @tn_accent;
+    color: @tn_on_accent;
+}
+
+tooltip, tooltip.background {
+    background-color: @tn_surface;
+    color: @tn_fg;
+    border: 1px solid @tn_border;
+}
+
+*:disabled, label:disabled {
+    color: @tn_dim;
+}
+
+switch:checked, checkbutton check:checked, radiobutton radio:checked,
+check:checked, radio:checked, progressbar progress, scale highlight {
+    background-image: none;
+    background-color: @tn_accent;
+    border-color: @tn_accent;
+    color: @tn_on_accent;
+}
+
+scrollbar slider {
+    background-color: @tn_dim;
+}
+
+/* macOS-style window buttons on the right: close red, minimise yellow, maximise green. */
+headerbar button.titlebutton, .titlebar button.titlebutton {
+    min-width: 14px;
+    min-height: 14px;
+    padding: 0;
+    margin: 0 4px;
+    border: none;
+    border-radius: 50%;
+    box-shadow: none;
+    color: transparent;
+    -gtk-icon-shadow: none;
+}
+headerbar button.titlebutton:hover { color: @tn_on_accent; }
+button.titlebutton.close { background-color: #f7768e; }
+button.titlebutton.minimize { background-color: #e0af68; }
+button.titlebutton.maximize { background-color: #9ece6a; }
+button.titlebutton:backdrop { background-color: @tn_dim; }
+
+/* Unfocused (backdrop) windows: Adwaita restyles these with its own, more
+   specific :backdrop rules, which would turn them grey. Same palette, a little
+   dimmer text, so focus is still visible. */
+window:backdrop, .background:backdrop, dialog:backdrop {
+    background-color: @tn_bg;
+    color: @tn_muted;
+}
+
+headerbar:backdrop, .titlebar:backdrop {
+    background: @tn_surface;
+    border-color: @tn_border;
+    color: @tn_muted;
+}
+
+.view:backdrop, treeview.view:backdrop, textview text:backdrop, iconview:backdrop,
+list:backdrop, list row:backdrop, scrolledwindow viewport:backdrop {
+    background-color: @tn_view;
+    color: @tn_muted;
+}
+
+treeview.view header button:backdrop {
+    background: @tn_surface;
+    color: @tn_dim;
+    border-color: @tn_border;
+}
+
+.view:selected:backdrop, treeview.view:selected:backdrop, list row:selected:backdrop,
+iconview:selected:backdrop, textview text selection:backdrop {
+    background-color: #3d59a1;
+    color: @tn_fg;
+}
+
+entry:backdrop, spinbutton:not(.vertical):backdrop {
+    background-color: @tn_view;
+    color: @tn_muted;
+    border-color: @tn_border;
+}
+
+button:backdrop, combobox button:backdrop, notebook > header tab:backdrop {
+    background-image: none;
+    background-color: @tn_raised;
+    color: @tn_muted;
+    border-color: @tn_border;
+}
+
+actionbar:backdrop, actionbar > revealer > box:backdrop, .inline-toolbar:backdrop,
+toolbar:backdrop, statusbar:backdrop, notebook > header:backdrop, .sidebar:backdrop,
+placessidebar list:backdrop {
+    background-color: @tn_surface;
+    border-color: @tn_border;
+}
+
+menu:backdrop, .menu:backdrop, popover:backdrop {
+    background-color: @tn_surface;
+    color: @tn_muted;
+}

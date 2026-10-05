@@ -9,7 +9,8 @@ Source: [ghost/binds.lua](../../config/hypr/ghost/binds.lua). `Super` is the Win
 | Super + E | Dolphin |
 | Super + W | rofi window switcher |
 | Super + V | Clipboard history picker |
-| Alt + F4 | Close active window |
+| Super + / | Keybind help: searchable list of every described bind in the running session |
+| Super + Q, Alt + F4 | Close active window |
 | Super + Ctrl + Escape | Force-kill active window |
 | Super + F | Toggle floating |
 | Super + M | Toggle maximized mode |
@@ -33,5 +34,7 @@ Source: [ghost/binds.lua](../../config/hypr/ghost/binds.lua). `Super` is the Win
 | Audio volume keys | Adjust volume in 5% steps, capped at 100% |
 | Audio mute / microphone mute | Toggle corresponding default device |
 | Media play/pause, previous, next | Control player through playerctl |
+
+Each bind in `binds.lua` has a description. Super + / reads them from `hyprctl binds -j` (via `jq` and rofi), so the help always matches the running session. Give new binds a description to have them listed.
 
 The volume and media bindings work while locked. Session locking depends on a running hypridle and functional hyprlock; confirm it manually before relying on it. Workspace semantics depend on whether the optional Lua package is installed; see [configuration](../getting-started/configuration.md).
