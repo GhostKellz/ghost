@@ -162,7 +162,7 @@ fn install(
 
     let entries = manifest.entries(source, &user.home, &chosen)?;
     let plan = deploy::plan(&entries, &state)?;
-    let ops = Ops::new(&user.home, true);
+    let ops = Ops::new(&user.home, true, root_destinations(Some(&manifest)));
     let missing = missing_packages(&manifest.packages(&chosen))?;
     let hooks = hooks_for(&manifest, &plan, &user.home);
 
@@ -276,7 +276,7 @@ fn restore(list: bool, dry_run: bool, yes: bool) -> anyhow::Result<()> {
         return Ok(());
     }
 
-    let ops = Ops::new(&user.home, true);
+    let ops = Ops::new(&user.home, true, root_destinations(None));
     let Some((id, preview)) = deploy::restore_latest(&user.paths, &ops, true)? else {
         println!("Nothing to restore.");
         return Ok(());
@@ -314,6 +314,20 @@ fn restore(list: bool, dry_run: bool, yes: bool) -> anyhow::Result<()> {
     }
     println!("Restored {id}.");
     Ok(())
+}
+
+/// System paths sudo may touch: root destinations from the embedded manifest,
+/// plus the checkout's when it differs (files from either may need removing).
+fn root_destinations(source: Option<&Manifest>) -> Vec<PathBuf> {
+    let mut dests = Manifest::parse(manifest::EMBEDDED)
+        .map(|m| m.root_destinations())
+        .unwrap_or_default();
+    if let Some(m) = source {
+        dests.extend(m.root_destinations());
+    }
+    dests.sort();
+    dests.dedup();
+    dests
 }
 
 /// Hooks of root components whose files the plan changes, in manifest order.

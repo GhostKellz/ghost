@@ -48,10 +48,23 @@ impl State {
     }
 }
 
+/// Creates `dir` (and missing parents) as 0700 and tightens it if it already
+/// exists: state and backups hold copies of the user's config files.
+pub fn private_dir(dir: &Path) -> anyhow::Result<()> {
+    use std::os::unix::fs::{DirBuilderExt, PermissionsExt};
+    fs::DirBuilder::new()
+        .recursive(true)
+        .mode(0o700)
+        .create(dir)
+        .with_context(|| format!("creating {}", dir.display()))?;
+    fs::set_permissions(dir, fs::Permissions::from_mode(0o700))
+        .with_context(|| format!("restricting {}", dir.display()))
+}
+
 /// Writes JSON through a temporary file and rename, so a crash never leaves half a file.
 pub fn write_json(path: &Path, value: &impl Serialize) -> anyhow::Result<()> {
     let dir = path.parent().context("state path has no parent")?;
-    fs::create_dir_all(dir).with_context(|| format!("creating {}", dir.display()))?;
+    private_dir(dir)?;
     let tmp = temp_sibling(path);
     fs::write(&tmp, serde_json::to_string_pretty(value)? + "\n")
         .with_context(|| format!("writing {}", tmp.display()))?;

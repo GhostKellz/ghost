@@ -56,7 +56,7 @@ Each file is compared with what Ghost last deployed there:
 | No longer shipped, unedited | Backed up, then removed |
 | No longer shipped, edited | Left in place, no longer tracked |
 
-Files outside your home directory (`sddm`, `gpu`) are written with `sudo install` and `mv`. Paths in a user component must be under `~/`, and paths in a root component must be absolute.
+Files outside your home directory (`sddm`, `gpu`) are written with `sudo install` and `mv`. Paths in a user component must be under `~/`, and paths in a root component must be absolute. Every sudo write, move, or removal must fall inside a root component's destination in `ghost.toml` (directories may also be created on the way to one), so a tampered state file or backup index cannot direct sudo elsewhere. Installed files never keep group or other write permission, and `~/.local/state/ghost` and its backups are private (0700).
 
 ## restore
 

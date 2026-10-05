@@ -46,10 +46,10 @@ before public discussion. Reporters who wish to be credited will be acknowledged
 
 | Component | Privilege / data access |
 |-----------|-------------------------|
-| Rust CLI | User process; refuses to run as root. Calls `sudo` for `pacman -S --needed`, root component files, and their hooks; each step is listed in the plan first |
+| Rust CLI | User process; refuses to run as root. Calls `sudo` for `pacman -S --needed`, root component files, and their hooks; each step is listed in the plan first. Sudo file operations are confined to root components' destinations in `ghost.toml` |
 | Desktop configuration | Runs commands as the logged-in user |
 | Clipboard history | Stores copied content through cliphist; may include sensitive text |
-| Backups and state | `~/.local/state/ghost/`; holds copies of replaced user and system files |
+| Backups and state | `~/.local/state/ghost/` (0700); holds copies of replaced user and system files |
 | SDDM theme | Runs inside the greeter as the `sddm` user; passes credentials only to SDDM's `login` call |
 | Optional udev rule | System configuration; installed only with `ghost install --with gpu` |
 

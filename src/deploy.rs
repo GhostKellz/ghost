@@ -15,7 +15,7 @@ use anyhow::{Context, bail};
 use serde::{Deserialize, Serialize};
 
 use crate::manifest::Entry;
-use crate::state::{State, hash_file, temp_sibling, write_json};
+use crate::state::{State, hash_file, private_dir, temp_sibling, write_json};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Kind {
@@ -229,16 +229,31 @@ impl Paths {
 /// Filesystem writes. Paths outside the user's home are written with sudo
 /// when enabled; everything else is written directly. Writes go through a
 /// temporary sibling and a rename either way.
+///
+/// Paths reach these methods from user-writable files (state.json, backup
+/// indexes), so every sudo operation is confined to the destinations that
+/// root components declare in ghost.toml.
 pub struct Ops {
     home: PathBuf,
     sudo: bool,
+    root_dests: Vec<PathBuf>,
+}
+
+/// What a sudo operation is allowed to touch.
+#[derive(Clone, Copy, PartialEq)]
+enum Reach {
+    /// Inside a declared root destination (files and their directories).
+    Inside,
+    /// Inside, or an ancestor directory that has to exist for one.
+    InsideOrAncestor,
 }
 
 impl Ops {
-    pub fn new(home: &Path, sudo: bool) -> Self {
+    pub fn new(home: &Path, sudo: bool, root_dests: Vec<PathBuf>) -> Self {
         Self {
             home: home.to_owned(),
             sudo,
+            root_dests,
         }
     }
 
@@ -246,12 +261,31 @@ impl Ops {
         self.sudo && !path.starts_with(&self.home)
     }
 
+    /// Refuses a sudo operation outside the declared root destinations. `..`
+    /// is rejected outright: `Path::starts_with` compares components
+    /// literally, so `dest/../../etc` would otherwise pass.
+    fn check_root(&self, path: &Path, reach: Reach) -> anyhow::Result<()> {
+        let escapes = path
+            .components()
+            .any(|c| c == std::path::Component::ParentDir);
+        let inside = self.root_dests.iter().any(|d| path.starts_with(d));
+        let ancestor =
+            reach == Reach::InsideOrAncestor && self.root_dests.iter().any(|d| d.starts_with(path));
+        if !path.is_absolute() || escapes || !(inside || ancestor) {
+            bail!(
+                "refusing to change {} with sudo: not inside a root component's destination in ghost.toml",
+                path.display()
+            );
+        }
+        Ok(())
+    }
+
     /// Copies `src` to `dest` keeping its permissions (e.g. the executable bit on scripts).
     fn install(&self, src: &Path, dest: &Path) -> anyhow::Result<()> {
         let tmp = temp_sibling(dest);
         if self.needs_root(dest) {
-            use std::os::unix::fs::PermissionsExt;
-            let mode = fs::metadata(src)?.permissions().mode() & 0o777;
+            self.check_root(dest, Reach::Inside)?;
+            let mode = install_mode(src)?;
             sudo(&[
                 "install".as_ref(),
                 "-m".as_ref(),
@@ -270,12 +304,18 @@ impl Ops {
         }
         fs::copy(src, &tmp)
             .with_context(|| format!("copying {} to {}", src.display(), tmp.display()))?;
+        {
+            use std::os::unix::fs::PermissionsExt;
+            fs::set_permissions(&tmp, fs::Permissions::from_mode(install_mode(src)?))
+                .with_context(|| format!("setting permissions on {}", tmp.display()))?;
+        }
         fs::rename(&tmp, dest).with_context(|| format!("replacing {}", dest.display()))?;
         Ok(())
     }
 
     fn remove(&self, path: &Path) -> anyhow::Result<()> {
         if self.needs_root(path) {
+            self.check_root(path, Reach::Inside)?;
             return sudo(&[
                 "rm".as_ref(),
                 "-f".as_ref(),
@@ -288,6 +328,7 @@ impl Ops {
 
     fn mkdir(&self, dir: &Path) -> anyhow::Result<()> {
         if self.needs_root(dir) {
+            self.check_root(dir, Reach::InsideOrAncestor)?;
             return sudo(&["mkdir".as_ref(), "--".as_ref(), dir.as_os_str()]);
         }
         fs::create_dir(dir).with_context(|| format!("creating {}", dir.display()))
@@ -300,7 +341,11 @@ impl Ops {
             return;
         }
         if self.needs_root(dir) {
-            let _ = sudo(&["rmdir".as_ref(), "--".as_ref(), dir.as_os_str()]);
+            // Only directories inside a destination: never an ancestor such
+            // as /usr/share/sddm/themes, even when empty.
+            if self.check_root(dir, Reach::Inside).is_ok() {
+                let _ = sudo(&["rmdir".as_ref(), "--".as_ref(), dir.as_os_str()]);
+            }
         } else {
             let _ = fs::remove_dir(dir);
         }
@@ -323,6 +368,18 @@ impl Ops {
         }
         Ok(missing)
     }
+}
+
+/// The source's permission bits without group/other write (and without
+/// setuid/setgid/sticky): keeps the executable bit on scripts, but never lets
+/// a loose checkout produce a world-writable udev rule or config file.
+fn install_mode(src: &Path) -> anyhow::Result<u32> {
+    use std::os::unix::fs::PermissionsExt;
+    let mode = fs::metadata(src)
+        .with_context(|| format!("reading {}", src.display()))?
+        .permissions()
+        .mode();
+    Ok(mode & 0o755)
 }
 
 fn sudo(args: &[&std::ffi::OsStr]) -> anyhow::Result<()> {
@@ -350,6 +407,9 @@ pub fn execute(
     revision: Option<String>,
     components: Vec<String>,
 ) -> anyhow::Result<Option<String>> {
+    // Before any original is copied in, and also tightening folders created
+    // by older versions: backups must never be readable by other users.
+    private_state_dirs(paths)?;
     let mut backup = None;
     if plan.has_changes() {
         let id = new_backup_id(&paths.backups)?;
@@ -478,6 +538,13 @@ fn timestamp(secs: u64) -> String {
     )
 }
 
+fn private_state_dirs(paths: &Paths) -> anyhow::Result<()> {
+    if let Some(dir) = paths.state.parent() {
+        private_dir(dir)?;
+    }
+    private_dir(&paths.backups)
+}
+
 /// Backups that can still be restored, oldest first.
 pub fn list_backups(paths: &Paths) -> anyhow::Result<Vec<Backup>> {
     let Ok(dir) = fs::read_dir(&paths.backups) else {
@@ -521,6 +588,9 @@ pub fn restore_latest(
         return Ok(None);
     };
     let dir = paths.backups.join(&backup.id);
+    if !dry_run {
+        private_state_dirs(paths)?;
+    }
     let mut report = RestoreReport::default();
 
     for (path, hash) in &backup.created {
@@ -593,7 +663,7 @@ mod tests {
 
         /// Direct writes only: tests never call sudo.
         fn ops(&self) -> Ops {
-            Ops::new(&self.root.join("home"), false)
+            Ops::new(&self.root.join("home"), false, Vec::new())
         }
 
         fn deploy(&self, entries: &[Entry]) -> (Plan, Option<String>) {
@@ -892,14 +962,79 @@ mod tests {
     #[test]
     fn sudo_only_outside_home_and_only_when_enabled() {
         let home = Path::new("/home/u");
-        let ops = Ops::new(home, true);
+        let ops = Ops::new(home, true, Vec::new());
         assert!(!ops.needs_root(Path::new("/home/u/.config/hypr/hyprland.lua")));
         assert!(ops.needs_root(Path::new("/etc/sddm.conf.d/zz-ghost.conf")));
         assert!(
             ops.needs_root(Path::new("/home/user2/x")),
             "another home is not ours"
         );
-        assert!(!Ops::new(home, false).needs_root(Path::new("/etc/x")));
+        assert!(!Ops::new(home, false, Vec::new()).needs_root(Path::new("/etc/x")));
+    }
+
+    #[test]
+    fn sudo_confined_to_root_destinations() {
+        let ops = Ops::new(
+            Path::new("/home/u"),
+            true,
+            vec![
+                PathBuf::from("/usr/share/sddm/themes/ghost"),
+                PathBuf::from("/etc/udev/rules.d/61-ghost-nvidia-dgpu.rules"),
+            ],
+        );
+        let ok = |p: &str, r| ops.check_root(Path::new(p), r).is_ok();
+        assert!(ok("/usr/share/sddm/themes/ghost/Main.qml", Reach::Inside));
+        assert!(ok(
+            "/etc/udev/rules.d/61-ghost-nvidia-dgpu.rules",
+            Reach::Inside
+        ));
+        assert!(!ok("/etc/udev/rules.d/99-evil.rules", Reach::Inside));
+        assert!(!ok("/etc/sudoers.d/x", Reach::Inside));
+        assert!(!ok(
+            "/usr/share/sddm/themes/ghost/../../../../etc/passwd",
+            Reach::Inside
+        ));
+        assert!(!ok("relative/path", Reach::Inside));
+        // Parents may be created for a destination, but not removed or written.
+        assert!(ok("/usr/share/sddm/themes", Reach::InsideOrAncestor));
+        assert!(!ok("/usr/share/sddm/themes", Reach::Inside));
+        assert!(!ok("/usr/lib", Reach::InsideOrAncestor));
+    }
+
+    #[test]
+    fn installed_files_never_group_or_world_writable() {
+        use std::os::unix::fs::PermissionsExt;
+        let fx = Fixture::new("modes");
+        let loose = fx.src("loose", "x");
+        fs::set_permissions(&loose, fs::Permissions::from_mode(0o777)).unwrap();
+        let dest = fx.dest("loose");
+        fx.deploy(&[Entry {
+            src: loose,
+            dest: dest.clone(),
+        }]);
+        assert_eq!(
+            fs::metadata(&dest).unwrap().permissions().mode() & 0o7777,
+            0o755
+        );
+    }
+
+    #[test]
+    fn state_and_backups_are_private() {
+        use std::os::unix::fs::PermissionsExt;
+        let fx = Fixture::new("private");
+        fx.deploy(&[Entry {
+            src: fx.src("f", "x"),
+            dest: fx.dest("f"),
+        }]);
+        let paths = fx.paths();
+        for dir in [paths.state.parent().unwrap(), paths.backups.as_path()] {
+            assert_eq!(
+                fs::metadata(dir).unwrap().permissions().mode() & 0o777,
+                0o700,
+                "{}",
+                dir.display()
+            );
+        }
     }
 
     #[test]

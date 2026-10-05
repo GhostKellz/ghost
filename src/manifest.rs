@@ -132,6 +132,17 @@ impl Manifest {
             .collect())
     }
 
+    /// Every destination of every root component: the only system paths Ghost
+    /// may change with sudo, whether or not the component is selected (so a
+    /// deselected component's files can still be removed or restored).
+    pub fn root_destinations(&self) -> Vec<PathBuf> {
+        self.components
+            .values()
+            .filter(|c| c.root)
+            .flat_map(|c| c.files.iter().map(|m| PathBuf::from(&m.dest)))
+            .collect()
+    }
+
     /// Packages of the chosen components, deduplicated, in manifest order.
     pub fn packages(&self, chosen: &[String]) -> Vec<&str> {
         let mut out: Vec<&str> = Vec::new();
