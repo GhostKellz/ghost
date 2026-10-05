@@ -15,7 +15,7 @@
 
 ---
 
-**In development:** desktop configuration and theme assets are present. The Rust CLI parses arguments, but `install`, `apply`, `restore`, and `doctor` all return “not implemented yet.” A live VM session still needs validation.
+**In development:** desktop configuration, theme assets, and an SDDM login theme are present. The Rust CLI installs, updates, and restores the desktop (`install`, `restore`) and diagnoses it (`doctor`); `apply` is not implemented yet. A live VM session still needs validation.
 
 ## Overview
 
@@ -23,25 +23,28 @@ Ghost brings a consistent Tokyo Night appearance to Hyprland, Waybar, rofi, noti
 
 ## Features
 
-- **Floating dock:** translucent surface, rounded corners, blue hover highlight, autohide, and a rofi launcher button.
-- **Keyboard workflow:** master/dwindle toggle, Vim-style window controls, workspace shortcuts, clipboard history, and annotated screenshots.
-- **Desktop shell:** per-output Waybar, swaync notifications, PipeWire controls, and Dolphin integration.
+- **Floating dock:** frosted glass, rounded corners, blue hover glow, auto-hide at the bottom edge, and a rofi launcher button.
+- **Keyboard workflow:** master/dwindle toggle, Vim-style window controls, per-monitor workspaces, clipboard history, annotated screenshots, and a SUPER+/ keybind help list.
+- **Desktop shell:** per-output Waybar with a workspace pager, swaync notifications, PipeWire controls, and Dolphin integration.
+- **Themed applications:** Tokyo Night for GTK 3, GTK 4 and KDE/Qt apps, macOS-style title buttons, and a translucent Ghostty.
+- **Login screen:** an SDDM theme with a frosted-glass panel.
 - **Display profiles:** workstation and VM examples, with a generic fallback for other hosts.
 - **OLED-conscious idle settings:** blank displays after ten minutes and lock after fifteen; no automatic suspend.
-- **Theme assets:** Night and Storm palettes and wallpapers. The checked-in application colors use Night; automatic theme switching is planned.
+- **Theme assets:** Night and Storm palettes. The checked-in application colors use Night; automatic theme switching is planned. Supply your own desktop and lock-screen images.
 
 ## Quick start
 
-To inspect and test the CLI with a Rust toolchain that supports the edition in [Cargo.toml](Cargo.toml):
+With a Rust toolchain that supports the edition in [Cargo.toml](Cargo.toml):
 
 ```bash
 git clone https://github.com/GhostKellz/ghost.git
 cd ghost
-cargo test --locked
-cargo run --locked -- --help
+cargo build --locked --release
+./target/release/ghost doctor
+./target/release/ghost install --dry-run
 ```
 
-To try the desktop, follow the [manual VM setup](docs/getting-started/installation.md). Building the CLI does not install the desktop. Use a dedicated test account and validate the compositor before adapting your main session.
+`ghost install` shows its plan and asks before installing packages or writing files; `ghost restore` undoes it. Try it on a test machine or VM first; see [installation](docs/getting-started/installation.md).
 
 ## Configuration
 
@@ -53,23 +56,22 @@ To try the desktop, follow the [manual VM setup](docs/getting-started/installati
 | Startup programs and dock arguments | `config/hypr/ghost/autostart.lua` |
 | Dock opacity and hover styling | `config/nwg-dock-hyprland/style.css` |
 | Theme colors | `themes/*/palette.toml` and application color files |
-| Desktop dependencies | `packages/hyprland.txt` |
+| Packages and deployed files | `ghost.toml` |
 
 See [configuration](docs/getting-started/configuration.md), [themes and dock](docs/guides/themes-and-dock.md), and the [keybindings](docs/reference/keybindings.md).
 
 ## Project structure
 
 ```text
-src/          Rust CLI parser and command skeleton
+ghost.toml    Components: packages and where each file is deployed
+src/          Rust CLI: install, restore, doctor
 config/       Hyprland and desktop application configuration
-packages/     Arch desktop package manifest
-system/       Optional host-specific udev rule
+system/       SDDM login theme and the NVIDIA udev rule
 themes/       Tokyo Night palette definitions
-wallpapers/   Bundled artwork and its license
 docs/         Setup, guides, reference, and architecture
 ```
 
-The desktop currently loads configuration files directly. The CLI does not deploy or generate them. See the [architecture](docs/internals/architecture.md) for the current runtime flow.
+`ghost install` copies configuration into place. The desktop then loads those files directly; nothing is generated yet. See the [architecture](docs/internals/architecture.md).
 
 ## Documentation
 

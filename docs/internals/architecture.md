@@ -1,6 +1,6 @@
 # Architecture
 
-Ghost currently has two separate execution paths: a desktop loading static configuration, and a Rust command parser that reports unimplemented operations.
+Ghost has two separate execution paths: the desktop loading its configuration, and the Rust CLI that installs that configuration and diagnoses the machine.
 
 ## Desktop startup
 
@@ -23,21 +23,30 @@ Fallbacks are reported, not silent: a host profile that exists but fails to load
 
 The compositor starts applications, and each application reads its own configuration. The palette TOML files are source assets for a future generator, not a live shared theme service. GTK CSS imports adjacent color files, rofi imports its Rasi colors, and the compositor loads a Lua palette.
 
-## CLI boundary
+## CLI install flow
 
 ```mermaid
-flowchart LR
-    Args[Arguments] --> Clap[clap parser]
-    Clap --> Help[Help or version output]
-    Clap --> Invalid[Reject invalid arguments]
-    Clap --> Command[Install apply restore doctor]
-    Command --> Error[anyhow error and unsuccessful exit]
+flowchart TD
+    Manifest[ghost.toml components] --> Select[Selected components]
+    State[state.json: hashes Ghost deployed] --> Plan
+    Select --> Plan[Three-way plan per file]
+    Select --> Missing[Missing packages]
+    Plan --> Show[Show plan and confirm]
+    Missing --> Guard{Pending updates?}
+    Guard -- yes --> Stop[Stop: run pacman -Syu first]
+    Guard -- no --> Show
+    Show --> Pacman[sudo pacman -S --needed]
+    Pacman --> Write[Back up, then write files]
+    Write --> Hooks[Root component hooks]
+    Write --> Record[Backup index and state]
 ```
 
-There are no package-manager calls, deployment writes, backup operations, or theme rendering in the CLI. This boundary matters: flags describe a proposed interface, while the only implemented behavior is parsing and failure.
+Reading the diagram: the plan compares each source file, the file on disk, and the hash Ghost recorded when it last deployed that path. That comparison decides between update, `.ghost-new` beside your edit, backup-and-replace, or leaving the file alone. State and the backup index are saved after every file, so an interrupted run can still be restored. `ghost restore` replays the latest backup index in reverse. `ghost doctor` only reads `/sys`, `/proc`, `/etc`, and command output.
+
+`ghost apply` (theme rendering) is not implemented; the palette TOML files are still source assets.
 
 ## Files and privileges
 
-Desktop configuration and assets live in the user's home directory after manual copying. The optional udev rule belongs to system administration and is not applied by Lua. Package installation also requires administrative privileges. The future installer must separate privileged package/system actions from user-owned config and backup operations.
+The CLI runs as the desktop user and refuses to run as root. User components may only write under `~/`. Root components (`sddm`, `gpu`) may only write absolute system paths, through `sudo install` and `mv`. Their originals are read as the user and backed up into the user's state directory. Packages are installed with `sudo pacman -S --needed`; the CLI never runs a system upgrade, enables services, or edits the bootloader or initramfs.
 
 See [configuration](../getting-started/configuration.md) for host assumptions and [roadmap](../development/roadmap.md) for planned implementation.

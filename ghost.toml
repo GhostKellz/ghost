@@ -1,0 +1,137 @@
+# Ghost components: the packages and repository files `ghost install` deploys.
+# `src` is relative to the repository root; a directory is copied recursively.
+# `dest` starts with `~/` (the installing user's home), or is an absolute
+# system path for `root` components, which are written with sudo.
+# `default = false` makes a component opt-in (`ghost install --with NAME`).
+# `hooks` run with sudo after a root component's files change.
+
+[components.core]
+description = "Hyprland, idle, lock screen, wallpaper, audio, clipboard, and screenshots"
+required = true
+packages = [
+    "hyprland", "hyprpaper", "hypridle", "hyprlock", "hyprpolkitagent",
+    "xdg-desktop-portal-hyprland", "xdg-desktop-portal-gtk",
+    "qt6-wayland", "qt5-wayland", "ttf-jetbrains-mono-nerd",
+    # Used by the keybinds: volume/media keys, clipboard history, screenshots.
+    "pipewire", "pipewire-pulse", "wireplumber", "playerctl",
+    "cliphist", "wl-clipboard", "grim", "slurp", "satty",
+    # SUPER+/ keybind help reads `hyprctl binds -j`.
+    "jq",
+]
+
+[[components.core.files]]
+src = "config/hypr"
+dest = "~/.config/hypr"
+
+[components.shell]
+description = "Waybar, rofi, swaync, and dock"
+packages = [
+    "waybar", "rofi", "swaync", "nwg-dock-hyprland",
+    # Opened from Waybar's audio and network modules.
+    "pavucontrol", "network-manager-applet",
+]
+
+[[components.shell.files]]
+src = "config/waybar"
+dest = "~/.config/waybar"
+
+[[components.shell.files]]
+src = "config/rofi"
+dest = "~/.config/rofi"
+
+[[components.shell.files]]
+src = "config/swaync"
+dest = "~/.config/swaync"
+
+[[components.shell.files]]
+src = "config/nwg-dock-hyprland/style.css"
+dest = "~/.config/nwg-dock-hyprland/style.css"
+
+[[components.shell.files]]
+src = "config/nwg-dock-hyprland/colors.css"
+dest = "~/.config/nwg-dock-hyprland/colors.css"
+
+[[components.shell.files]]
+src = "config/nwg-dock-hyprland/launcher.svg"
+dest = "~/.config/nwg-dock-hyprland/launcher.svg"
+
+# nwg-dock reads (and, when you pin from the dock, writes) its pinned list at
+# $XDG_CACHE_HOME/nwg-dock-pinned, not in its config directory.
+[[components.shell.files]]
+src = "config/nwg-dock-hyprland/pinned"
+dest = "~/.cache/nwg-dock-pinned"
+
+# NoDisplay overrides: hide developer/system tools pulled in as dependencies
+# (Qt tools, Avahi browsers, lstopo, ...) from the launcher. A same-named file
+# in ~/.local/share/applications replaces the system entry for this user only.
+[[components.shell.files]]
+src = "config/applications"
+dest = "~/.local/share/applications"
+
+[components.apps]
+description = "Ghostty, Dolphin with thumbnails and archives, Tokyo Night GTK and KDE/Qt theming"
+packages = [
+    "ghostty", "dolphin", "archlinux-xdg-menu", "kio-extras", "ffmpegthumbs",
+    "kdegraphics-thumbnailers", "ark", "kvantum",
+    # KDE platform theme: Qt apps follow the Tokyo Night kdeglobals scheme.
+    "plasma-integration",
+    # Adwaita-dark base for the GTK 3 overrides.
+    "gnome-themes-extra",
+    # Ghostty's font (CaskaydiaCove Nerd Font).
+    "ttf-cascadia-code-nerd",
+]
+
+[[components.apps.files]]
+src = "config/gtk-3.0"
+dest = "~/.config/gtk-3.0"
+
+[[components.apps.files]]
+src = "config/gtk-4.0"
+dest = "~/.config/gtk-4.0"
+
+# GTK 3 colours ship as a theme (selected in gtk-3.0/settings.ini) so apps'
+# own CSS (dock, Waybar) still takes precedence over it.
+[[components.apps.files]]
+src = "config/themes"
+dest = "~/.local/share/themes"
+
+[[components.apps.files]]
+src = "config/ghostty"
+dest = "~/.config/ghostty"
+
+[[components.apps.files]]
+src = "config/kde"
+dest = "~/.config/ghost/kde"
+
+[components.sddm]
+description = "Ghost login screen theme for SDDM, set as the active theme"
+default = false
+root = true
+packages = ["sddm"]
+
+[[components.sddm.files]]
+src = "system/sddm/ghost"
+dest = "/usr/share/sddm/themes/ghost"
+
+[[components.sddm.files]]
+src = "assets/logo.png"
+dest = "/usr/share/sddm/themes/ghost/assets/logo.png"
+
+[[components.sddm.files]]
+src = "system/sddm/zz-ghost.conf"
+dest = "/etc/sddm.conf.d/zz-ghost.conf"
+
+[components.gpu]
+description = "Stable /dev/dri/nvidia-dgpu link for NVIDIA alongside another GPU"
+default = false
+root = true
+hooks = [
+    ["udevadm", "control", "--reload"],
+    ["udevadm", "trigger", "--subsystem-match=drm", "--action=change"],
+    # trigger only queues events; wait so the link exists (or is gone) when ghost returns.
+    ["udevadm", "settle", "--timeout=10"],
+]
+
+[[components.gpu.files]]
+src = "system/udev/61-ghost-nvidia-dgpu.rules"
+dest = "/etc/udev/rules.d/61-ghost-nvidia-dgpu.rules"

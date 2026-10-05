@@ -46,11 +46,12 @@ before public discussion. Reporters who wish to be credited will be acknowledged
 
 | Component | Privilege / data access |
 |-----------|-------------------------|
-| Current Rust CLI | User process; parses arguments and returns an unimplemented error |
+| Rust CLI | User process; refuses to run as root. Calls `sudo` for `pacman -S --needed`, root component files, and their hooks; each step is listed in the plan first |
 | Desktop configuration | Runs commands as the logged-in user |
 | Clipboard history | Stores copied content through cliphist; may include sensitive text |
-| Manual package installation | Administrative access through the package manager |
-| Optional udev rule | System configuration; requires administrative installation |
+| Backups and state | `~/.local/state/ghost/`; holds copies of replaced user and system files |
+| SDDM theme | Runs inside the greeter as the `sddm` user; passes credentials only to SDDM's `login` call |
+| Optional udev rule | System configuration; installed only with `ghost install --with gpu` |
 
 Idle display blanking does not lock the session immediately. The supplied policy
 blanks after ten minutes and locks after fifteen. Test hypridle and hyprlock in

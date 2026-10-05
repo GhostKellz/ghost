@@ -12,7 +12,7 @@ cargo run --locked -- --help
 cargo run --locked -- install --help
 ```
 
-The command tests cover clap's definition, rejection of an out-of-range opacity, and an unimplemented command error. They do not test installation or desktop behavior. All operational subcommands currently fail intentionally; see [CLI reference](../reference/cli.md).
+Unit tests cover the manifest rules, the three-way file plan, backups and restore, and the doctor checks. Filesystem tests use fixture trees under `target/test-fixtures/` and never call sudo or pacman. They do not exercise packages, root writes, or a live desktop; test those on a VM with `ghost install --dry-run` first. See the [CLI reference](../reference/cli.md).
 
 ## Configuration checks
 

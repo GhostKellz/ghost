@@ -1,60 +1,53 @@
-# Manual VM installation
+# Installation
 
-The installer is not implemented. This procedure is for a dedicated Arch test account in a VM, with a recoverable console and a snapshot taken before package or configuration changes. It does not change your login manager.
+Ghost is still being validated. Try it on a test machine or VM first, with a recoverable console, and take a snapshot before installing. Packages and system files change; your login manager changes only if you choose the `sddm` component.
 
 ## Prerequisites
 
-Use an updated Arch installation with working graphics drivers, a usable login session, and a Hyprland build supporting the Lua API used in this repository. Match its installed version to the [upstream versioned documentation](https://wiki.hypr.land/version-selector/). Record `Hyprland --version` during validation.
+Use an up-to-date Arch installation with working graphics drivers and a Hyprland build that supports the Lua API this repository uses. Match it to the [upstream versioned documentation](https://wiki.hypr.land/version-selector/) and record `Hyprland --version` during validation. Ghost doesn't install GPU drivers; `ghost doctor` reports driver problems and suggests fixes.
 
-On a passthrough VM, confirm which outputs the guest exposes and whether the passed-through GPU has a monitor or dummy plug. A virtual console alone does not demonstrate rendering on the NVIDIA GPU. Verify the renderer and output mapping in the guest rather than inferring acceleration from the display connection.
+On a passthrough VM, confirm which outputs the guest exposes and whether the passed-through GPU has a monitor or dummy plug. A virtual console alone does not demonstrate rendering on the NVIDIA GPU.
 
-Review [packages/hyprland.txt](../../packages/hyprland.txt). It describes desktop packages, not a complete base OS or GPU driver installation. Several dock pins reference optional applications outside that manifest; remove unavailable pins or install those applications separately.
-
-From the cloned repository, in **Bash**, install the reviewed manifest using a full system upgrade:
+## Build and check
 
 ```bash
-mapfile -t ghost_packages < <(awk 'NF && $1 !~ /^#/ {print $1}' packages/hyprland.txt)
-sudo pacman -Syu --needed "${ghost_packages[@]}"
+git clone https://github.com/GhostKellz/ghost.git
+cd ghost
+cargo build --locked --release
+./target/release/ghost doctor
 ```
 
-Check package availability and any provider/conflict prompts on the guest. Do not substitute similarly named packages without checking their CLI and configuration compatibility.
+## Install
 
-## Copy into a clean test account
-
-The following Bash block refuses to replace existing configuration directories or Ghost data. For an existing desktop, back up those paths outside the repository and use a separate test account first. Run from the repository root:
+From the repository root, as your desktop user:
 
 ```bash
-set -e
-for component in hypr waybar rofi swaync nwg-dock-hyprland; do
-    if [[ -e "$HOME/.config/$component" || -L "$HOME/.config/$component" ]]; then
-        echo "Existing config: $component; use a clean test account." >&2
-        exit 1
-    fi
-done
-if [[ -e "$HOME/.local/share/ghost" || -L "$HOME/.local/share/ghost" ]]; then
-    echo "Existing Ghost data; use a clean test account." >&2
-    exit 1
-fi
-mkdir -p "$HOME/.config" "$HOME/.local/share/ghost/wallpapers"
-for component in hypr waybar rofi swaync nwg-dock-hyprland; do
-    cp -a "config/$component" "$HOME/.config/"
-done
+./target/release/ghost install --dry-run
+./target/release/ghost install
 ```
+
+The plan lists missing packages, every file change, and any follow-up commands, then asks before acting. Add opt-in components with `--with sddm` or `--with gpu`, and skip defaults with `--without`. If your system has pending updates, Ghost stops and asks you to run `sudo pacman -Syu` first. The [CLI reference](../reference/cli.md) covers each file case and option.
+
+Files you have edited are never overwritten: Ghost writes its new version beside yours as `<file>.ghost-new`. Anything it replaces is backed up.
 
 Ghost ships no wallpapers. Copy your own images into `~/.local/share/ghost/wallpapers/` (hyprpaper cycles them) and one image to `~/.local/share/ghost/lockscreen.png` (the lock screen). See [wallpapers](../guides/themes-and-dock.md#wallpapers).
 
-Review [host selection](configuration.md) before launch, especially if the hostname is `arch`. For a generic VM, use automatic outputs first. This procedure intentionally does not install the workstation-specific udev rule or an optional workspace package.
+Review [host selection](configuration.md) before launch, especially if the hostname is `arch`. The `arch` profile requires the `gpu` component.
 
 ## Launch and validate
 
-From the guest's local TTY, as the test user, start the compositor using the installed package's supported launcher. For installations supporting direct launch:
+From a TTY, or the Hyprland entry in your login manager, start the compositor:
 
 ```bash
 Hyprland
 ```
 
-Keep a separate recovery console available. In the new session run `hyprctl configerrors`, `hyprctl monitors`, and `hyprctl layers`, then work through [the acceptance checklist](../guides/troubleshooting.md). A clean config-error list does not validate shell applications, lock behavior, GPU acceleration, or screenshots.
+Keep a separate recovery console available. Run `ghost doctor` inside the session; it adds `hyprctl configerrors` to its checks. Then run `hyprctl monitors` and `hyprctl layers`, and work through [the acceptance checklist](../guides/troubleshooting.md). A clean config-error list does not validate shell applications, lock behavior, GPU acceleration, or screenshots.
 
-## Rollback
+## Update
 
-End the test session from your recovery console or login manager. Restore the VM snapshot to undo the entire trial, including packages. To undo only a clean-account config deployment, remove only the five directories and Ghost data created by the copy step after confirming they contain no later work. If testing against backed-up configuration, restore each original path after ending the session. `ghost restore` cannot perform this yet.
+Pull the repository, rebuild, and run `ghost install` again. Components installed earlier stay installed. Review any `.ghost-new` files it reports and merge what you want.
+
+## Roll back
+
+`ghost restore` undoes the most recent install: originals come back, files Ghost created are removed unless you changed them, and system-file hooks run again. Repeat it to step further back; `ghost restore --list` shows what's available. Packages are not removed. Restore the VM snapshot to undo a whole trial, including packages.

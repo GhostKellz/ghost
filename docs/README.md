@@ -1,6 +1,6 @@
 # Ghost documentation
 
-Setup and reference for the checked-in desktop configuration and Rust CLI skeleton.
+Setup and reference for the Ghost desktop configuration and its Rust CLI.
 
 ```mermaid
 flowchart TD
@@ -20,6 +20,7 @@ flowchart TD
 ## Guides and reference
 
 - [Themes and dock](guides/themes-and-dock.md) — translucency, blur, colors, and wallpaper paths.
+- [Login screen](guides/login-screen.md) — SDDM theme preview, installation, activation, and rollback.
 - [Troubleshooting](guides/troubleshooting.md) — runtime diagnostics and VM acceptance checks.
 - [Keybindings](reference/keybindings.md) — keyboard and mouse controls.
 - [CLI](reference/cli.md) — accepted arguments and current failure behavior.
