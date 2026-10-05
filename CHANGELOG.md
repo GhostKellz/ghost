@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Tokyo Night for applications: `Ghost-TokyoNight` GTK 3 theme with macOS-style title buttons, GTK 4 colours, a KDE colour scheme for Dolphin via the KDE platform theme, and Ghostty on frosted glass.
 - Waybar workspace pager; SUPER+/ keybind help generated from bind descriptions; SUPER+Q closes windows.
 - Launcher overrides hiding developer and system tools; Ghostty keeps its own icon.
+- Yazi terminal file manager (Super+Shift+E) alongside Dolphin, themed to match Ghostty.
 - Optional host profile `startup` commands; the `arch-dev` profile renders on its passed-through GPU to a headless output for VNC.
 
 ### Changed

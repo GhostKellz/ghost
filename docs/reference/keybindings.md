@@ -7,6 +7,7 @@ Source: [ghost/binds.lua](../../config/hypr/ghost/binds.lua). `Super` is the Win
 | Super + Return | Ghostty terminal |
 | Super + Space | rofi application launcher |
 | Super + E | Dolphin |
+| Super + Shift + E | Yazi (terminal file manager) in Ghostty |
 | Super + W | rofi window switcher |
 | Super + V | Clipboard history picker |
 | Super + / | Keybind help: searchable list of every described bind in the running session |

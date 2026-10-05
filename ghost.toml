@@ -79,6 +79,8 @@ packages = [
     "gnome-themes-extra",
     # Ghostty's font (CaskaydiaCove Nerd Font).
     "ttf-cascadia-code-nerd",
+    # Yazi terminal file manager (SUPER+SHIFT+E) and its preview/search helpers.
+    "yazi", "ffmpegthumbnailer", "7zip", "poppler", "fd", "ripgrep", "fzf", "zoxide", "resvg",
 ]
 
 [[components.apps.files]]
@@ -102,6 +104,10 @@ dest = "~/.config/ghostty"
 [[components.apps.files]]
 src = "config/kde"
 dest = "~/.config/ghost/kde"
+
+[[components.apps.files]]
+src = "config/yazi"
+dest = "~/.config/yazi"
 
 [components.sddm]
 description = "Ghost login screen theme for SDDM, set as the active theme"

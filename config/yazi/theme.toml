@@ -1,0 +1,50 @@
+# Yazi in the ghostkellz hacker-blue palette (matches Ghostty). Keys not set
+# here keep Yazi's built-in dark theme.
+
+[mgr]
+cwd = { fg = "#57c7ff", bold = true }
+find_keyword = { fg = "#f3f99d", bold = true, underline = true }
+symlink_target = { fg = "#9aedfe", italic = true }
+marker_copied = { fg = "#8aff80", bg = "#8aff80" }
+marker_cut = { fg = "#ff5c57", bg = "#ff5c57" }
+marker_marked = { fg = "#9aedfe", bg = "#9aedfe" }
+marker_selected = { fg = "#7aa2f7", bg = "#7aa2f7" }
+border_style = { fg = "#23476a" }
+
+[indicator]
+current = { fg = "#ffffff", bg = "#23476a", bold = true }
+parent = { fg = "#57c7ff", bg = "#16161e" }
+preview = { underline = true }
+
+[tabs]
+active = { fg = "#0d1117", bg = "#57c7ff", bold = true }
+inactive = { fg = "#57c7ff", bg = "#16161e" }
+
+[mode]
+normal_main = { fg = "#0d1117", bg = "#57c7ff", bold = true }
+normal_alt = { fg = "#57c7ff", bg = "#16161e" }
+select_main = { fg = "#0d1117", bg = "#9aedfe", bold = true }
+select_alt = { fg = "#9aedfe", bg = "#16161e" }
+unset_main = { fg = "#0d1117", bg = "#ff5c57", bold = true }
+unset_alt = { fg = "#ff5c57", bg = "#16161e" }
+
+[status]
+perm_type = { fg = "#8aff80" }
+perm_read = { fg = "#f3f99d" }
+perm_write = { fg = "#ff5c57" }
+perm_exec = { fg = "#9aedfe" }
+perm_sep = { fg = "#686868" }
+
+[input]
+border = { fg = "#57c7ff" }
+title = { fg = "#57c7ff", bold = true }
+selected = { fg = "#0d1117", bg = "#57c7ff" }
+
+[pick]
+border = { fg = "#57c7ff" }
+active = { fg = "#9aedfe", bold = true }
+
+[which]
+border = { fg = "#57c7ff" }
+cand = { fg = "#9aedfe" }
+desc = { fg = "#7aa2f7" }

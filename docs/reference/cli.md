@@ -27,7 +27,7 @@ Components are defined in [ghost.toml](../../ghost.toml):
 |---|---|---|
 | `core` | Required | Hyprland, idle, lock, wallpaper, audio, clipboard, screenshot packages and `~/.config/hypr` |
 | `shell` | Yes | Waybar, rofi, swaync, dock (style, launcher icon, pinned apps), launcher entry overrides |
-| `apps` | Yes | Ghostty, Dolphin, Ark; Tokyo Night GTK 3 theme, GTK 4 colours, KDE colour scheme, Ghostty config |
+| `apps` | Yes | Ghostty, Dolphin, Ark, Yazi with preview helpers; Tokyo Night GTK 3 theme, GTK 4 colours, KDE colour scheme, Ghostty and Yazi config |
 | `sddm` | Opt-in | [Login theme](../guides/login-screen.md) and the drop-in that selects it |
 | `gpu` | Opt-in | udev rule creating `/dev/dri/nvidia-dgpu`, then a udev reload |
 

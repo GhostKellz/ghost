@@ -44,6 +44,7 @@ The `apps` component themes regular applications in Tokyo Night:
 | GTK 4 / libadwaita | Dark colour scheme (gsettings at startup) plus Tokyo Night colour variables | [gtk-4.0/gtk.css](../../config/gtk-4.0/gtk.css) |
 | Qt / KDE (Dolphin, Ark) | `QT_QPA_PLATFORMTHEME=kde` (plasma-integration) and a Tokyo Night `kdeglobals` found through `XDG_CONFIG_DIRS`. A Plasma user's own `~/.config/kdeglobals` still wins, so Plasma sessions are unaffected | [kde/kdeglobals](../../config/kde/kdeglobals) |
 | Ghostty | Hacker-blue text (`#57c7ff`) on `#0d1117` at 82% opacity, blurred by Hyprland; CaskaydiaCove Nerd Font | [ghostty/config](../../config/ghostty/config) |
+| Yazi | Same hacker-blue palette; image, video, PDF, and archive previews inside Ghostty | [yazi/theme.toml](../../config/yazi/theme.toml) |
 
 GTK apps that draw their own title bar show macOS-style buttons on the right: red close, yellow minimise, green maximise. Most windows have no title bar under Hyprland; use the [keybindings](../reference/keybindings.md) instead.
 

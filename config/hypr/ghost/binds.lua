@@ -39,6 +39,7 @@ function M.setup(ws)
     bind(key("Return"), "Terminal", hl.dsp.exec_cmd(terminal))
     bind(key("Space"), "Application launcher", hl.dsp.exec_cmd(launcher))
     bind(key("E"), "File manager", hl.dsp.exec_cmd(file_manager))
+    bind(key("SHIFT + E"), "Yazi file manager (terminal)", hl.dsp.exec_cmd(terminal .. " -e yazi"))
     -- No overview plugin exists for 0.56 (hyprexpo was removed upstream), so
     -- SUPER+W lists open windows instead.
     bind(key("W"), "Window switcher", hl.dsp.exec_cmd(window_switcher))
