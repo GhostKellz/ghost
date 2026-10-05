@@ -10,6 +10,8 @@ archive/
 
 # Personal wallpapers with unclear licenses — installed locally, never published
 wallpapers/collection/
+system/sddm/ghost/backgrounds/
+system/sddm/ghost/theme.conf.user
 
 # Logo drafts
 assets/prototype*.png

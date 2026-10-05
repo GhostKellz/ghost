@@ -1,0 +1,10 @@
+[SddmGreeterTheme]
+Name=Ghost
+Description=Tokyo Night login theme for the Ghost desktop
+License=MIT
+Type=sddm-theme
+MainScript=Main.qml
+ConfigFile=theme.conf
+Theme-Id=ghost
+Theme-API=2.0
+QtVersion=6
