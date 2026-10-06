@@ -6,6 +6,7 @@ use clap::{Parser, Subcommand};
 
 use crate::deploy::{self, Kind, Ops, Paths, Plan};
 use crate::manifest::{self, Manifest};
+use crate::sources::{self, Source};
 use crate::state::{self, State};
 use crate::{doctor, system};
 
@@ -115,6 +116,8 @@ fn doctor() -> anyhow::Result<()> {
 struct User {
     home: PathBuf,
     paths: Paths,
+    /// Checkouts of `run` sources: `$XDG_CACHE_HOME/ghost/sources`.
+    cache: PathBuf,
 }
 
 /// Ghost manages one user's files, so it must run as that user, not root.
@@ -129,8 +132,14 @@ fn user() -> anyhow::Result<User> {
         bail!("run ghost as your desktop user, not root; it asks for sudo when a step needs it");
     }
     let home = PathBuf::from(std::env::var_os("HOME").context("HOME is not set")?);
+    let cache = std::env::var_os("XDG_CACHE_HOME")
+        .map(PathBuf::from)
+        .filter(|p| p.is_absolute())
+        .unwrap_or_else(|| home.join(".cache"))
+        .join("ghost/sources");
     Ok(User {
         paths: Paths::under(&state::dir(&home, std::env::var_os("XDG_STATE_HOME"))),
+        cache,
         home,
     })
 }
@@ -165,6 +174,12 @@ fn install(
     let ops = Ops::new(&user.home, true, root_destinations(Some(&manifest)));
     let missing = missing_packages(&manifest.packages(&chosen))?;
     let hooks = hooks_for(&manifest, &plan, &user.home);
+    let all_sources: Vec<Source> = manifest
+        .sources(&chosen)
+        .into_iter()
+        .map(|s| Source::from_spec(s, &user.home))
+        .collect();
+    let fetch = sources::pending(&all_sources, &state);
 
     println!("Components:");
     for name in &chosen {
@@ -191,12 +206,18 @@ fn install(
     for hook in &hooks {
         println!("Then: sudo {}", hook.join(" "));
     }
+    if !fetch.is_empty() {
+        println!("Sources to fetch at pinned commits (run as you, never with sudo):");
+        for s in &fetch {
+            println!("  {} @ {} from {}", s.name, s.short_rev(), s.url);
+        }
+    }
 
     if dry_run {
         println!("\nDry run: nothing changed.");
         return Ok(());
     }
-    if missing.is_empty() && !plan.has_changes() && state.components == chosen {
+    if missing.is_empty() && !plan.has_changes() && fetch.is_empty() && state.components == chosen {
         println!("\nNothing to do.");
         return Ok(());
     }
@@ -235,6 +256,15 @@ fn install(
     for hook in &hooks {
         let args: Vec<&str> = hook.iter().map(String::as_str).collect();
         run_sudo(&args)?;
+    }
+    for source in &fetch {
+        println!("Fetching {} @ {}", source.name, source.short_rev());
+        sources::apply(source, &user.cache)?;
+        // Recorded per source, so an interrupted run resumes where it stopped.
+        state
+            .sources
+            .insert(source.name.clone(), source.rev.clone());
+        state.save(&user.paths.state)?;
     }
     println!();
     if let Some(id) = backup {

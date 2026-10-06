@@ -2,6 +2,7 @@ mod cli;
 mod deploy;
 mod doctor;
 mod manifest;
+mod sources;
 mod state;
 mod system;
 

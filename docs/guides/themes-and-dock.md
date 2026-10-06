@@ -52,14 +52,7 @@ On a machine that also runs Plasma, note that `~/.config/gtk-3.0/settings.ini` i
 
 ## Icons
 
-GTK and KDE settings name the `Tela-blue-dark` icon theme. Ghost does not install it yet; install it per user from [vinceliuice/Tela-icon-theme](https://github.com/vinceliuice/Tela-icon-theme) after reviewing `install.sh`:
-
-```bash
-git clone --depth 1 https://github.com/vinceliuice/Tela-icon-theme
-cd Tela-icon-theme && ./install.sh -d ~/.local/share/icons blue
-```
-
-Without it, apps fall back to the default icons. Ghostty's launcher entry is overridden to keep Ghostty's own icon.
+GTK and KDE settings name the `Tela-blue-dark` icon theme. The `apps` component installs it per user into `~/.local/share/icons` from [vinceliuice/Tela-icon-theme](https://github.com/vinceliuice/Tela-icon-theme) at a pinned commit (see [Sources](../reference/cli.md#sources)). Without it, apps fall back to the default icons. Ghostty's launcher entry is overridden to keep Ghostty's own icon.
 
 ## Launcher entries
 

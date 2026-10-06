@@ -25,9 +25,9 @@ Components are defined in [ghost.toml](../../ghost.toml):
 
 | Component | Default | Contents |
 |---|---|---|
-| `core` | Required | Hyprland, idle, lock, wallpaper, audio, clipboard, screenshot packages and `~/.config/hypr` |
+| `core` | Required | Hyprland, idle, lock, wallpaper, audio, clipboard, screenshot packages, `~/.config/hypr`, and the split-monitor-workspaces plugin |
 | `shell` | Yes | Waybar, rofi, swaync, dock (style, launcher icon, pinned apps), launcher entry overrides |
-| `apps` | Yes | Ghostty, Dolphin, Ark, Yazi with preview helpers; Tokyo Night GTK 3 theme, GTK 4 colours, KDE colour scheme, Ghostty and Yazi config |
+| `apps` | Yes | Ghostty, Dolphin, Ark, Yazi with preview helpers; Tokyo Night GTK 3 theme, GTK 4 colours, KDE colour scheme, Ghostty and Yazi config; Tela blue icons |
 | `sddm` | Opt-in | [Login theme](../guides/login-screen.md) and the drop-in that selects it |
 | `gpu` | Opt-in | udev rule creating `/dev/dri/nvidia-dgpu`, then a udev reload |
 
@@ -35,12 +35,24 @@ A re-run keeps components installed earlier unless you pass `--without`.
 
 Order of operations:
 
-1. Show the components, missing packages, every file action, and any follow-up commands.
+1. Show the components, missing packages, every file action, sources to fetch, and any follow-up commands.
 2. If packages are missing and `pacman -Qu` reports pending updates, stop. Run `sudo pacman -Syu` first. Ghost never upgrades the system itself, so it can't cause a partial upgrade.
 3. Ask for confirmation.
 4. `sudo pacman -S --needed` the missing packages.
 5. Write files, backing up anything replaced or removed.
 6. Run the component hooks with sudo.
+7. Fetch pinned sources, as you.
+
+### Sources
+
+Third-party code that isn't packaged for Arch is fetched from git at a full commit id named in `ghost.toml`, never a branch or tag. Ghost runs `git fetch --depth 1 <url> <commit>` and checks that the checkout is at that commit before using it. Bumping a pin means reviewing the upstream code at the new commit first.
+
+| Source | Component | Installed as |
+|---|---|---|
+| [split-monitor-workspaces](https://github.com/Duckonaut/split-monitor-workspaces) | `core` | A checkout at `~/.config/hypr/plugins/split-monitor-workspaces` |
+| [Tela-icon-theme](https://github.com/vinceliuice/Tela-icon-theme) | `apps` | Upstream's `install.sh -d ~/.local/share/icons blue`, run from a checkout in `$XDG_CACHE_HOME/ghost/sources/` |
+
+A source is fetched when its pin changes, or when a checkout destination is no longer at the pinned commit. Ghost refuses to touch a destination that exists but isn't a git checkout. Sources are not backed up or removed by `restore`; delete the checkout or icon directories yourself if you no longer want them.
 
 Each file is compared with what Ghost last deployed there:
 
@@ -83,5 +95,6 @@ On the open modules with `UseKernelSuspendNotifiers=1` (the nvidia-utils default
 
 | Path | Contents |
 |---|---|
-| `$XDG_STATE_HOME/ghost/state.json` (default `~/.local/state/ghost/`) | Deployed components, file hashes, source revision |
+| `$XDG_STATE_HOME/ghost/state.json` (default `~/.local/state/ghost/`) | Deployed components, file hashes, Ghost's git revision, installed source commits |
 | `$XDG_STATE_HOME/ghost/backups/<id>/` | Originals and an index for one install; renamed `<id>.restored` once restored |
+| `$XDG_CACHE_HOME/ghost/sources/` (default `~/.cache/ghost/sources/`) | Checkouts of sources installed by a `run` command |

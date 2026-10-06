@@ -15,7 +15,7 @@
 
 ---
 
-**In development:** desktop configuration, theme assets, and an SDDM login theme are present. The Rust CLI installs, updates, and restores the desktop (`install`, `restore`) and diagnoses it (`doctor`); `apply` is not implemented yet. A live VM session still needs validation.
+**In development:** desktop configuration, theme assets, and an SDDM login theme are present. The Rust CLI installs, updates, and restores the desktop (`install`, `restore`) and diagnoses it (`doctor`); `apply` is not implemented yet. Installs from a fresh account and live sessions are tested on an Arch VM with a passed-through NVIDIA GPU; the multi-monitor HDR workstation profile has not been run on its hardware yet.
 
 ## Overview
 

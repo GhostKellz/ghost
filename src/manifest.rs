@@ -34,6 +34,21 @@ pub struct Component {
     /// Commands run with sudo after this component's files change.
     #[serde(default)]
     pub hooks: Vec<Vec<String>>,
+    /// Third-party git repositories fetched at a pinned commit.
+    #[serde(default)]
+    pub sources: Vec<SourceSpec>,
+}
+
+/// A git repository pinned to a reviewed commit: checked out at `dest`, or
+/// checked out in Ghost's cache with `run` executed inside it as the user.
+#[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct SourceSpec {
+    pub name: String,
+    pub url: String,
+    pub rev: String,
+    pub dest: Option<String>,
+    pub run: Option<Vec<String>>,
 }
 
 fn yes() -> bool {
@@ -102,6 +117,18 @@ impl Manifest {
             if !component.hooks.is_empty() && !component.root {
                 bail!("component {name}: hooks run with sudo, so the component must be root");
             }
+            for source in &component.sources {
+                validate_source(name, component, source)?;
+            }
+        }
+        let mut names: Vec<&str> = manifest
+            .components
+            .values()
+            .flat_map(|c| c.sources.iter().map(|s| s.name.as_str()))
+            .collect();
+        names.sort_unstable();
+        if let Some(pair) = names.windows(2).find(|p| p[0] == p[1]) {
+            bail!("source name {:?} is used twice", pair[0]);
         }
         Ok(manifest)
     }
@@ -143,6 +170,14 @@ impl Manifest {
             .collect()
     }
 
+    /// Sources of the chosen components, in manifest order.
+    pub fn sources(&self, chosen: &[String]) -> Vec<&SourceSpec> {
+        chosen
+            .iter()
+            .flat_map(|name| self.components[name].sources.iter())
+            .collect()
+    }
+
     /// Packages of the chosen components, deduplicated, in manifest order.
     pub fn packages(&self, chosen: &[String]) -> Vec<&str> {
         let mut out: Vec<&str> = Vec::new();
@@ -181,6 +216,42 @@ impl Manifest {
         }
         Ok(entries)
     }
+}
+
+fn validate_source(
+    component_name: &str,
+    component: &Component,
+    s: &SourceSpec,
+) -> anyhow::Result<()> {
+    let at = format!("component {component_name}, source {:?}", s.name);
+    if s.name.is_empty()
+        || !s
+            .name
+            .chars()
+            .all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '-')
+    {
+        bail!("{at}: name must be lowercase letters, digits, and '-'");
+    }
+    if component.root {
+        bail!("{at}: sources run as the user, so the component must not be root");
+    }
+    if !s.url.starts_with("https://") {
+        bail!("{at}: url must be https");
+    }
+    // Tags and branches can be moved upstream; only a full commit id pins code.
+    if s.rev.len() != 40 || !s.rev.chars().all(|c| c.is_ascii_hexdigit()) {
+        bail!("{at}: rev must be a full 40-character commit id");
+    }
+    match (&s.dest, &s.run) {
+        (Some(dest), None) => {
+            if !dest.starts_with("~/") || dest.contains("/../") || dest.ends_with("/..") {
+                bail!("{at}: dest must start with ~/ and stay inside it");
+            }
+        }
+        (None, Some(run)) if !run.is_empty() => {}
+        _ => bail!("{at}: set exactly one of dest or run (non-empty)"),
+    }
+    Ok(())
 }
 
 fn collect(src: &Path, dest: &Path, out: &mut Vec<Entry>) -> anyhow::Result<()> {
@@ -277,6 +348,58 @@ mod tests {
             manifest.packages(&["core".into(), "extra".into()]),
             ["a", "b", "c"]
         );
+    }
+
+    #[test]
+    fn source_validation() {
+        let rev = "656ac1f024f0c1d6ec007f4c25cbc02951d51c9c";
+        let manifest = |extra: &str, body: &str| {
+            format!(
+                "[components.a]\ndescription = \"a\"\n{extra}\n[[components.a.sources]]\nname = \"plugin\"\nurl = \"https://example.com/x\"\n{body}\n"
+            )
+        };
+        let ok = manifest("", &format!("rev = \"{rev}\"\ndest = \"~/.config/x\""));
+        assert!(Manifest::parse(&ok).is_ok());
+        let run = manifest("", &format!("rev = \"{rev}\"\nrun = [\"./install.sh\"]"));
+        assert!(Manifest::parse(&run).is_ok());
+        for (extra, body, why) in [
+            (
+                "",
+                "rev = \"v0.56.2\"\ndest = \"~/x\"".to_owned(),
+                "tag instead of commit",
+            ),
+            (
+                "",
+                format!("rev = \"{}\"\ndest = \"~/x\"", &rev[..12]),
+                "short commit",
+            ),
+            (
+                "",
+                format!("rev = \"{rev}\"\ndest = \"/etc/x\""),
+                "system dest",
+            ),
+            (
+                "",
+                format!("rev = \"{rev}\"\ndest = \"~/../x\""),
+                "escaping dest",
+            ),
+            ("", format!("rev = \"{rev}\""), "neither dest nor run"),
+            (
+                "",
+                format!("rev = \"{rev}\"\ndest = \"~/x\"\nrun = [\"x\"]"),
+                "both",
+            ),
+            (
+                "root = true",
+                format!("rev = \"{rev}\"\ndest = \"~/x\""),
+                "root component",
+            ),
+        ] {
+            assert!(Manifest::parse(&manifest(extra, &body)).is_err(), "{why}");
+        }
+        let http = manifest("", &format!("rev = \"{rev}\"\ndest = \"~/x\""))
+            .replace("https://", "http://");
+        assert!(Manifest::parse(&http).is_err(), "plain http");
     }
 
     #[test]

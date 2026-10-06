@@ -16,6 +16,9 @@ pub struct State {
     pub components: Vec<String>,
     /// Destination path to the SHA-256 of the content Ghost wrote there.
     pub files: BTreeMap<PathBuf, String>,
+    /// Source name to the commit last installed from it.
+    #[serde(default)]
+    pub sources: BTreeMap<String, String>,
 }
 
 pub const STATE_VERSION: u32 = 1;

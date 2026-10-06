@@ -37,11 +37,7 @@ The manual setup uses standard `~/.config/` paths. The workspace module honors `
 
 ## Workspaces and startup
 
-The optional `split-monitor-workspaces` package gives each monitor its own five persistent workspaces. Ghost loads it from `~/.config/hypr/plugins/split-monitor-workspaces/lua/`; the CLI does not install it yet. Clone the tag matching `Hyprland --version` (pure Lua, no build step):
-
-```bash
-git clone --depth 1 --branch v0.56.2 https://github.com/Duckonaut/split-monitor-workspaces ~/.config/hypr/plugins/split-monitor-workspaces
-```
+The `split-monitor-workspaces` plugin gives each monitor its own five persistent workspaces. Ghost loads it from `~/.config/hypr/plugins/split-monitor-workspaces/lua/`, and `ghost install` checks it out there at the commit pinned in `ghost.toml`, which must match the installed Hyprland (see [Sources](../reference/cli.md#sources)). It is pure Lua with no build step.
 
 Without it, Ghost shows a warning notification and uses native `m~N` and `m±1` selectors; this does not pre-create five workspaces per output. If the package is present but fails to load, an error notification shows the cause. Verify workspace behavior separately with and without the package.
 

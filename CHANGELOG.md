@@ -17,12 +17,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Waybar workspace pager; SUPER+/ keybind help generated from bind descriptions; SUPER+Q closes windows.
 - Launcher overrides hiding developer and system tools; Ghostty keeps its own icon.
 - Yazi terminal file manager (Super+Shift+E) alongside Dolphin, themed to match Ghostty.
+- Pinned git sources: `ghost install` fetches the split-monitor-workspaces plugin and Tela blue icons at reviewed commits.
 - Optional host profile `startup` commands; the `arch-dev` profile renders on its passed-through GPU to a headless output for VNC.
 
 ### Changed
 - Dock auto-hides and reveals at the bottom edge, with a blue launcher button and no per-icon backgrounds; Waybar and the dock are more translucent.
 
 ### Fixed
+- Removing a file Ghost no longer ships no longer leaves its empty directories behind.
 - Dock pins were installed to a path nwg-dock never reads; they now go to `~/.cache/nwg-dock-pinned`.
 
 ### Removed

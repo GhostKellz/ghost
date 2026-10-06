@@ -351,6 +351,43 @@ impl Ops {
         }
     }
 
+    /// After a file is removed, removes parent directories it left empty, but
+    /// never the home directory or the standard XDG directories under it.
+    /// Outside home, only directories inside a root destination qualify.
+    fn prune_empty_parents(&self, removed: &Path) {
+        let keep: Vec<PathBuf> = [
+            "",
+            ".config",
+            ".local",
+            ".local/share",
+            ".local/state",
+            ".cache",
+        ]
+        .iter()
+        .map(|rel| self.home.join(rel))
+        .collect();
+        let mut dir = removed.parent();
+        while let Some(d) = dir {
+            if keep.iter().any(|k| k == d) || d.parent().is_none() {
+                break;
+            }
+            let empty = fs::read_dir(d).is_ok_and(|mut entries| entries.next().is_none());
+            if !empty {
+                break;
+            }
+            if self.needs_root(d) {
+                if self.check_root(d, Reach::Inside).is_err()
+                    || sudo(&["rmdir".as_ref(), "--".as_ref(), d.as_os_str()]).is_err()
+                {
+                    break;
+                }
+            } else if fs::remove_dir(d).is_err() {
+                break;
+            }
+            dir = d.parent();
+        }
+    }
+
     /// Creates missing parent directories and returns the ones it made, outermost first.
     fn create_parents(&self, dest: &Path) -> anyhow::Result<Vec<PathBuf>> {
         let mut missing = Vec::new();
@@ -480,6 +517,7 @@ fn apply(
             let (dir, record) = backup.context("change without a backup record")?;
             save_original(dir, record, dest)?;
             ops.remove(dest)?;
+            ops.prune_empty_parents(dest);
             state.files.remove(dest);
         }
         Kind::Keep => {
@@ -851,6 +889,32 @@ mod tests {
 
         restore_latest(&fx.paths(), &fx.ops(), false).unwrap();
         assert_eq!(read(&gone), "g");
+    }
+
+    #[test]
+    fn removal_prunes_emptied_directories_and_restore_brings_them_back() {
+        let fx = Fixture::new("prune");
+        let deep = fx.dest(".config/qt6ct/colors/scheme.conf");
+        let keep = fx.dest(".config/other/keep");
+        fs::create_dir_all(keep.parent().unwrap()).unwrap();
+        fs::write(&keep, "mine").unwrap();
+        fx.deploy(&[Entry {
+            src: fx.src("scheme", "x"),
+            dest: deep.clone(),
+        }]);
+        fs::remove_file(fx.root.join("src/scheme")).unwrap();
+
+        fx.deploy(&[]);
+        assert!(!deep.exists());
+        assert!(
+            !fx.dest(".config/qt6ct").exists(),
+            "emptied directories removed"
+        );
+        assert!(fx.dest(".config").exists(), "XDG directories are kept");
+        assert_eq!(read(&keep), "mine");
+
+        restore_latest(&fx.paths(), &fx.ops(), false).unwrap();
+        assert_eq!(read(&deep), "x", "restore recreates the directories");
     }
 
     #[test]

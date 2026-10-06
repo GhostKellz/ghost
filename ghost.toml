@@ -4,6 +4,9 @@
 # system path for `root` components, which are written with sudo.
 # `default = false` makes a component opt-in (`ghost install --with NAME`).
 # `hooks` run with sudo after a root component's files change.
+# `sources` are git repositories pinned to a full commit id: checked out at
+# `dest`, or checked out in ~/.cache/ghost/sources with `run` executed inside
+# (as the user). Review the code at a new commit before changing `rev`.
 
 [components.core]
 description = "Hyprland, idle, lock screen, wallpaper, audio, clipboard, and screenshots"
@@ -17,11 +20,21 @@ packages = [
     "cliphist", "wl-clipboard", "grim", "slurp", "satty",
     # SUPER+/ keybind help reads `hyprctl binds -j`.
     "jq",
+    # Fetches the pinned sources below.
+    "git",
 ]
 
 [[components.core.files]]
 src = "config/hypr"
 dest = "~/.config/hypr"
+
+# Independent workspaces per monitor (pure Lua). Pin the tag matching the
+# installed Hyprland; reviewed at this commit: no shell, file, or network calls.
+[[components.core.sources]]
+name = "split-monitor-workspaces"
+url = "https://github.com/Duckonaut/split-monitor-workspaces"
+rev = "656ac1f024f0c1d6ec007f4c25cbc02951d51c9c" # v0.56.2
+dest = "~/.config/hypr/plugins/split-monitor-workspaces"
 
 [components.shell]
 description = "Waybar, rofi, swaync, and dock"
@@ -82,6 +95,14 @@ packages = [
     # Yazi terminal file manager (SUPER+SHIFT+E) and its preview/search helpers.
     "yazi", "ffmpegthumbnailer", "7zip", "poppler", "fd", "ripgrep", "fzf", "zoxide", "resvg",
 ]
+
+# Tela blue icons, installed per user by upstream's script. Reviewed at this
+# commit: no sudo or network; writes only its own theme directories.
+[[components.apps.sources]]
+name = "tela-icon-theme"
+url = "https://github.com/vinceliuice/Tela-icon-theme"
+rev = "a1fffc5bfab716bd022dd228ee96fe3965cdb33d"
+run = ["./install.sh", "-d", "~/.local/share/icons", "blue"]
 
 [[components.apps.files]]
 src = "config/gtk-3.0"
