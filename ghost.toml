@@ -28,6 +28,11 @@ packages = [
 src = "config/hypr"
 dest = "~/.config/hypr"
 
+# Lock screen avatar, the same logo as the SDDM theme.
+[[components.core.files]]
+src = "assets/logo.png"
+dest = "~/.config/hypr/assets/logo.png"
+
 # Independent workspaces per monitor (pure Lua). Pin the tag matching the
 # installed Hyprland; reviewed at this commit: no shell, file, or network calls.
 [[components.core.sources]]

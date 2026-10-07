@@ -21,9 +21,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Optional host profile `startup` commands; the `arch-dev` profile renders on its passed-through GPU to a headless output for VNC.
 
 ### Changed
+- Lock screen matches the login screen: translucent panel with logo, user name, and blue password field; no magenta.
+- Notifications and the control center are frosted Tokyo Night with blue accents and a red-tinted critical style; the control center floats 8 px from the screen edges.
 - Dock auto-hides and reveals at the bottom edge, with a blue launcher button and no per-icon backgrounds; Waybar and the dock are more translucent.
 
 ### Fixed
+- Pinned sources no longer run while sudo's cached credentials are still valid.
 - Removing a file Ghost no longer ships no longer leaves its empty directories behind.
 - Dock pins were installed to a path nwg-dock never reads; they now go to `~/.cache/nwg-dock-pinned`.
 

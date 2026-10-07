@@ -34,6 +34,12 @@ Tune the deployed files, then restart the dock process or log out and back in. A
 
 Blur is requested for `waybar`, `rofi`, `nwg-dock`, `swaync-control-center`, and `swaync-notification-window`, with `ignore_alpha = 0.1` so the translucent bar and dock still qualify. Confirm the namespaces with `hyprctl layers`.
 
+## Notifications and lock screen
+
+Notification popups and the control center use the same frosted surface (`alpha(@surface, 0.55)`) with a hairline blue border; critical notifications get a red border and tint. [swaync/style.css](../../config/swaync/style.css) retunes swaync's own CSS variables rather than replacing its stylesheet, and [swaync/config.json](../../config/swaync/config.json) sets only the widths and the control center's 8 px margins, so every other option keeps swaync's default. `swaync-client -rs` reloads the CSS; margin and width changes apply after swaync restarts (next login).
+
+The lock screen ([hyprlock.conf](../../config/hypr/hyprlock.conf)) mirrors the [login screen](login-screen.md): a translucent panel with the logo in a blue-to-cyan ring, your user name, and a pill password field, under the clock and date, in Noto Sans. The wallpaper stays sharp; hyprlock cannot blur behind a single widget, so the panel is translucent rather than frosted. The field outline turns cyan while checking, red on failure (with the attempt count), and yellow with Caps Lock on. Lock with Super+Escape; hypridle locks after 15 minutes idle.
+
 ## Applications
 
 The `apps` component themes regular applications in Tokyo Night:

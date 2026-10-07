@@ -52,7 +52,7 @@ Third-party code that isn't packaged for Arch is fetched from git at a full comm
 | [split-monitor-workspaces](https://github.com/Duckonaut/split-monitor-workspaces) | `core` | A checkout at `~/.config/hypr/plugins/split-monitor-workspaces` |
 | [Tela-icon-theme](https://github.com/vinceliuice/Tela-icon-theme) | `apps` | Upstream's `install.sh -d ~/.local/share/icons blue`, run from a checkout in `$XDG_CACHE_HOME/ghost/sources/` |
 
-A source is fetched when its pin changes, or when a checkout destination is no longer at the pinned commit. Ghost refuses to touch a destination that exists but isn't a git checkout. Sources are not backed up or removed by `restore`; delete the checkout or icon directories yourself if you no longer want them.
+Sources never run with sudo, and Ghost runs `sudo -k` before them so third-party code can't reuse cached sudo credentials. A source is fetched when its pin changes, or when a checkout destination is no longer at the pinned commit. Ghost refuses to touch a destination that exists but isn't a git checkout. Sources are not backed up or removed by `restore`; delete the checkout or icon directories yourself if you no longer want them.
 
 Each file is compared with what Ghost last deployed there:
 

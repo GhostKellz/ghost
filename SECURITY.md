@@ -46,7 +46,7 @@ before public discussion. Reporters who wish to be credited will be acknowledged
 
 | Component | Privilege / data access |
 |-----------|-------------------------|
-| Rust CLI | User process; refuses to run as root. Calls `sudo` for `pacman -S --needed`, root component files, and their hooks; each step is listed in the plan first. Sudo file operations are confined to root components' destinations in `ghost.toml` |
+| Rust CLI | User process; refuses to run as root. Calls `sudo` for `pacman -S --needed`, root component files, and their hooks; each step is listed in the plan first. Sudo file operations are confined to root components' destinations in `ghost.toml`. Pinned git sources run as the user after `sudo -k` |
 | Desktop configuration | Runs commands as the logged-in user |
 | Clipboard history | Stores copied content through cliphist; may include sensitive text |
 | Backups and state | `~/.local/state/ghost/` (0700); holds copies of replaced user and system files |

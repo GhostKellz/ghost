@@ -257,6 +257,17 @@ fn install(
         let args: Vec<&str> = hook.iter().map(String::as_str).collect();
         run_sudo(&args)?;
     }
+    if !fetch.is_empty() {
+        // Sources run third-party code as you. Drop sudo's cached credentials
+        // (from the steps above or your shell) so that code can't reuse them.
+        let status = std::process::Command::new("sudo")
+            .arg("-k")
+            .status()
+            .context("running sudo -k")?;
+        if !status.success() {
+            bail!("sudo -k failed ({status}); not running sources with sudo still cached");
+        }
+    }
     for source in &fetch {
         println!("Fetching {} @ {}", source.name, source.short_rev());
         sources::apply(source, &user.cache)?;
